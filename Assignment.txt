@@ -1,1 +1,22 @@
+FUNCTION getdata (): #get 
 
+
+FUNCTION Main Menu ()
+DELCARE data as ARRAY 
+While flag == True:
+  PRINT ("Please Select An Option:")
+  PRINT ("1. Add New Data")
+  PRINT ("2. Edit Existing Data")
+  PRINT ("3. Search Data")
+  PRINT ("4. View All Data")
+  PRINT ("5. Exit")
+  GET option
+
+IF option == "1"
+  PRINT ("Enter Tenant's Name")
+  get tname 
+  
+IF option == "5"
+  return flag = false
+  
+END FUNCTION
