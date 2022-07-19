@@ -12,6 +12,7 @@ While flag == True:
   PRINT ("5. Exit")
   GET option
 
+details = []
 IF option == "1"
   PRINT ("Enter Tenant's Name")
   GET Tenant Name
@@ -26,6 +27,12 @@ IF option == "1"
   PRINT ("Enter Current Work Employer")
   GET Work Employer
   
+  details.append(tenantname)
+  details.append(tenantidnumber)
+  details.append(placeofbirth)
+  details.append(cityofbirth)
+  details.append(workhistory)
+  details.append(currentworkemployer)
  
 IF option == "2"
   
