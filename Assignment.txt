@@ -14,8 +14,25 @@ While flag == True:
 
 IF option == "1"
   PRINT ("Enter Tenant's Name")
-  get tname 
+  GET Tenant Name
+  PRINT ("Enter Tenant's ID Number")
+  GET Tenant ID Number
+  PRINT ("Enter Place of Birth")
+  GET Place of Birth
+  PRINT ("Enter City of Birth")
+  GET City of Birth
+  PRINT ("Enter Work History")
+  GET Work History
+  PRINT ("Enter Current Work Employer")
+  GET Work Employer
   
+ 
+IF option == "2"
+  
+IF option == "3"
+
+IF option == "4"
+
 IF option == "5"
   return flag = false
   
