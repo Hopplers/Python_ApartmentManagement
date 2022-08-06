@@ -1,19 +1,18 @@
 def newdata():
-  dfile = []
-  file = open("tenent.txt", "a")
-  tname = input("Enter Tenent's Name")
-  tid = input("Enter Tenent's ID Number")
-  tbirthplace = input("Enter Tenent's Place of Birth")
-  tbirthcity = input("Enter Tenent's City of Birth")
-  tworkhis = input("Enter Tenent's Work History")
-  tworkemp = input("Enter Tenet's Work Employee")
-  details = [tname, tid, tbirthplace, tbirthcity, tworkthis, tworkemp]
-  dfile.append(details)
-  
-  for record in dfile:
-    for item in record:
-      file.write(item + ",")
-    file.write("\n)
+    dfile = []
+    with open ("tenent.txt", "a") as file:
+        tname = input("Enter Tenent's Name")
+        tid = input("Enter Tenent's ID Number")
+        tbirthplace = input("Enter Tenent's Place of Birth")
+        tbirthcity = input("Enter Tenent's City of Birth")
+        tworkhis = input("Enter Tenent's Work History")
+        tworkemp = input("Enter Tenet's Work Employee")
+        details = [tname, tid, tbirthplace, tbirthcity, tworkhis, tworkemp]
+        dfile.append(details)
+        for record in dfile:
+            for item in record:
+                file.write(item + ",")
+            file.write("\n")
   
 def mainmenu():
   data = []
