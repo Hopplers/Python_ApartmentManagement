@@ -32,12 +32,12 @@ def finduserpw():
             userpw.append(item)
         return userpw
 
-def passwordreset(x):
+def passwordreset(key):
     print("Reset Password")
     time.sleep(0.5)
     userpw = finduserpw()
     for data in userpw:
-        while data[0] == x:
+        while data[0] == key:
             newpw = input("New Password: ")
             passwordstrength(newpw)
             option = input("Do you want to save the new password (1) or change another new password (2) ?\n")
@@ -55,9 +55,9 @@ def passwordreset(x):
 def passwordstrength(password):
     print(password + "hello")
 
-def userpwreplace(x):
+def userpwreplace(newdata):
     with open("userpw", "w") as records:
-        for record in x:
+        for record in newdata:
             for item in record:
                 records.write(item + ",")
             records.write("\n")
@@ -197,7 +197,7 @@ def new_payment_data():  #function for entering new payment data
 def view_apartment_data():
     while True:
         file_name = "apartment"
-        apartment_list = finddata(file_name)
+        apartment_list = findrecord(file_name)
         apartment_no = input("Which Apartment No.'s Data do you wish to view? (Enter Apartment No.)\n")
         for aprtmnt_data in apartment_list:
             if aprtmnt_data[0] == apartment_no:
@@ -215,9 +215,9 @@ def view_apartment_data():
             i = 1
             return i
 
-def finddata(x):
+def findrecord(file_name):
     data = []
-    with open(x, "r") as record:
+    with open(file_name, "r") as record:
         for line in record:
             item = line.strip().strip(",").split(",")
             data.append(item)
@@ -226,7 +226,7 @@ def finddata(x):
 def view_tenant_data():
     while True:
         file_name = "tenant"
-        tenant_list = finddata(file_name)
+        tenant_list = findrecord(file_name)
         tenant_id_number = input("Which Tenant's Data do you wish to view? (Enter Tenant ID No.)\n")
         for tenantdata in tenant_list:
             if tenantdata[0] == tenant_id_number:
@@ -254,7 +254,7 @@ def view_tenant_data():
 def view_payment_data():
     while True:
         file_name = "payment"
-        payment_list = finddata(file_name)
+        payment_list = findrecord(file_name)
         tenant_id_number = input("Which Payment Data do you wish to view? (Enter Tenant ID No.)\n")
         for paymentdata in payment_list:
             if paymentdata[0] == tenant_id_number:
@@ -277,10 +277,10 @@ def view_payment_data():
 def modify_apartment_data():
     while True:
         file_name = "apartment"
-        data = finddata(file_name)
-        no = input("Which Apartment Data do you wish to Modify? (Enter Apartment No.)\n")
-        selection, replacement = showapdata(data, no)
-        replacedata(no, data, selection, replacement, file_name)
+        record = findrecord(file_name)
+        column = input("Which Apartment Data do you wish to Modify? (Enter Apartment No.)\n")
+        selection, replacement = showapdata(record, column)
+        replacedata(column, record, selection, replacement, file_name)
         option = input("Do you want to continue modifying Apartment Data(1), modify another type of data(2) or return to Main Menu(3)?\n")
         if option == "1":
             continue
@@ -291,9 +291,9 @@ def modify_apartment_data():
             i = 1
             return i
 
-def showapdata(x, y):
-    for data in x:
-        while data[0] == y:
+def showapdata(record, column):
+    for data in record:
+        while data[0] == column:
             print("The current data available for the Apartment No. you wish to modify is:\n")
             print("1. Apartment No.            : ", data[0])
             print("2. Apartment Square Footage : ", data[1])
@@ -304,13 +304,13 @@ def showapdata(x, y):
             replacement = input("What do you want to replace the data with?\n")
             return selection, replacement
 
-def replacedata(v, w, x, y, z):
-    for record in w:
-        if v == record[0]:
-            record[x] = y
+def replacedata(column, data, selection, replacement, file_name):
+    for record in data:
+        if column == record[0]:
+            record[selection] = replacement
 
-    with open(z, "w") as records:
-        for record in w:
+    with open(file_name, "w") as records:
+        for record in data:
             for item in record:
                 records.write(item + ",")
             records.write("\n")
@@ -318,10 +318,10 @@ def replacedata(v, w, x, y, z):
 def modify_tenant_data():
     while True:
         file_name = "tenant"
-        data = finddata(file_name)
-        no = input("Which Tenant's Data do you wish to Modify? (Enter Tenant ID No.)\n")
-        selection, replacement = showtndata(data, no)
-        replacedata(no, data, selection, replacement, file_name)
+        record = findrecord(file_name)
+        column = input("Which Tenant's Data do you wish to Modify? (Enter Tenant ID No.)\n")
+        selection, replacement = showtndata(record, column)
+        replacedata(column, record, selection, replacement, file_name)
         option = input("Do you want to continue modifying Tenant Data(1), modify another type of data(2) or return to Main Menu(3)?\n")
         if option == "1":
             continue
@@ -332,9 +332,9 @@ def modify_tenant_data():
             i = 1
             return i
 
-def showtndata(x, y):
-    for data in x:
-        while data[0] == y:
+def showtndata(record, column):
+    for data in record:
+        while data[0] == column:
             print("The current data available for the Tenant No. you wish to modify is:\n")
             print("1. Tenant ID No.        :", data[0])
             print("2. Full Tenant Name     :", data[1])
@@ -355,10 +355,10 @@ def showtndata(x, y):
 def modify_payment_data():
     while True:
         file_name = "payment"
-        data = finddata(file_name)
-        no = input("Which Payment Data do you wish to Modify? (Enter Tenant ID No.)\n")
-        selection, replacement = showpmdata(data, no)
-        replacedata(no, data, selection, replacement, file_name)
+        record = findrecord(file_name)
+        column = input("Which Payment Data do you wish to Modify? (Enter Tenant ID No.)\n")
+        selection, replacement = showpmdata(record, column)
+        replacedata(column, record, selection, replacement, file_name)
         option = input("Do you want to continue modifying Payment Data(1), modify another type of data(2) or return to Main Menu(3)?\n")
         if option == "1":
             continue
@@ -369,9 +369,9 @@ def modify_payment_data():
             i = 1
             return i
 
-def showpmdata(x, y):
-    for data in x:
-        while data[0] == y:
+def showpmdata(record, column):
+    for data in record:
+        while data[0] == column:
             print("The current data available for the Payment you wish to modify is:\n")
             print("1. Tenant ID No.    :", data[0])
             print("2. Tenant Name      :", data[1])
