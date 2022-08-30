@@ -14,8 +14,8 @@ def login():
                     break
                 else:
                     if data[1] == password:
-                            print("Welcome to D&J Tenant Management System")
-                            amainmenu()
+                            auditlogin(username)
+                            amainmenu(username)
                             pass
                     else:
                         print("Incorrect password, please try again")
@@ -23,6 +23,17 @@ def login():
         else:
             print("Incorrect username, please try again")
             continue
+
+def auditlogin(username):
+    dnt = currentdatetime()
+    data = (dnt + username + " has log in ")
+    with open("audit", "a") as record:
+        record.write(data + "\n")
+
+def currentdatetime():
+    now = datetime.now()
+    dnt = now.strftime("[%d/%m/%Y %H:%M:%S] ")
+    return dnt
 
 def finduserpw():
     userpw = []
@@ -62,7 +73,8 @@ def userpwreplace(newdata):
                 records.write(item + ",")
             records.write("\n")
 
-def amainmenu():  # main menu for admin
+def amainmenu(username):  # main menu for admin
+    print(username, ", Welcome to D&J Tenant Management System")
     flag = True
     i = 1
     while flag:
@@ -102,43 +114,69 @@ def amainmenu():  # main menu for admin
             elif option == "4":
                 i = 1
 
+        if i == 5:
+            option = input("Which Data do you wish to delete?\n1. Apartment Data\n2. Tenant Data\n3. Payment Data\n4. Return to Main Menu\n")
+            if option == "1":
+                i = remove_apartment_data()
+            elif option == "2":
+                i = remove_tenant_data()
+            elif option == "3":
+                i = remove_payment_data()
+            elif option == "4":
+                i = 1
+
         if i == 6:
             print("Goodbye!")
+            username = "hi"
+            auditlogout(username)
             time.sleep(0.5)
             break
 
 def amainmenuselect():  #admin main menu select
-    option = int(input("Please Select an Option\n1. Enter New Data\n2. Search Current Available Data\n3. Modify Current Available Data\n4. View Audit Log\n5. Log Out \n"))
+    option = int(input("Please Select an Option\n1. Enter New Data\n2. Search Current Available Data\n3. Modify Current Available Data\n4. Delete Current Available Data\n5. Log Out \n"))
     if 6 > option > 0:
         i = option + 1
         return i
 
 def new_apartment_data():  #function for entering new apartment data
     while True:
+        file_name = "apartment"
         apartment_data = []
         apartment_no = input("Enter Apartment No.:")
         apartment_square_footage = input("Enter Apartment Square Footage: ")
         rent_amount = input("Enter Rent Amount: ")
         details_apartment = [apartment_no, apartment_square_footage, rent_amount]
         apartment_data.append(details_apartment)
-        with open("apartment", "a") as records:
-            for record in apartment_data:
-                for item in record:
-                    records.write(item + ",")
-                records.write("\n")
-            print("Data saved.")
-            option = input("Do you want to enter another apartment data(1), enter another type of new data(2) or return to Main Menu(3)?\n")
-            if option == "1":
-                continue
-            elif option == "2":
-                i = 2
-                return i
-            elif option == "3":
-                i = 1
-                return i
+        savedata(file_name, apartment_data, apartment_no)
+        option = input("Do you want to enter another apartment data(1), enter another type of new data(2) or return to Main Menu(3)?\n")
+        if option == "1":
+            continue
+        elif option == "2":
+            i = 2
+            return i
+        elif option == "3":
+            i = 1
+            return i
+
+def savedata(file_name, data, name):
+    datatype = file_name
+    with open(file_name, "a") as records:
+        for record in data:
+            for item in record:
+                records.write(item + ",")
+            records.write("\n")
+        print("Data Saved.")
+        auditnewdata(datatype, name)
+
+def auditnewdata(datatype,name):
+    dnt = currentdatetime()
+    data = (dnt + "new " + datatype + " data for " + name + " has been added")
+    with open("audit", "a") as record:
+        record.write(data + "\n")
 
 def new_tenant_data():  #function for entering new tenant data
     while True:
+        file_name = "tenant"
         tenant_data = []
         id_number = input("Enter Tenant ID No.: ")
         full_name = input("Enter Full Name: ")
@@ -152,12 +190,7 @@ def new_tenant_data():  #function for entering new tenant data
         apartment_no = input("Enter Apartment No.: ")
         details_tenant = [id_number, full_name, gender, phone_number, address, city, job_history, current_job, date_of_acquisition, apartment_no]
         tenant_data.append(details_tenant)
-        with open("tenant", "a") as records:
-            for record in tenant_data:
-                for item in record:
-                    records.write(item + ",")
-                records.write("\n")
-        print("Data saved.")
+        savedata(file_name, tenant_data, id_number)
         option = input("Do you want to enter another tenant data(1), enter another type of new data(2) or return to Main Menu(3)?\n")
         if option == "1":
             continue
@@ -170,6 +203,7 @@ def new_tenant_data():  #function for entering new tenant data
 
 def new_payment_data():  #function for entering new payment data
     while True:
+        file_name = "payment"
         payment_data = []
         tenant_id = input("Enter Tenant ID No.: ")
         tenant_name = input("Enter Tenant Name: ")
@@ -178,25 +212,21 @@ def new_payment_data():  #function for entering new payment data
         payment_status = input("Enter Payment Status: ")
         details_payment = [tenant_id, tenant_name, apartment_no, amount_paid, payment_status]
         payment_data.append(details_payment)
-        with open("payment", "a") as records:
-            for record in payment_data:
-                for item in record:
-                    records.write(item + ",")
-                records.write("\n")
-            print("Data Saved.")
-            option = input("Do you want to enter another payment data(1), enter another type of new data(2) or return to Main Menu(3)?\n")
-            if option == "1":
-                continue
-            elif option == "2":
-                i = 2
-                return i
-            elif option == "3":
-                i = 1
-                return i
+        savedata(file_name, payment_data, tenant_id)
+        option = input("Do you want to enter another payment data(1), enter another type of new data(2) or return to Main Menu(3)?\n")
+        if option == "1":
+            continue
+        elif option == "2":
+            i = 2
+            return i
+        elif option == "3":
+            i = 1
+            return i
 
 def view_apartment_data():
     while True:
         file_name = "apartment"
+        datatype = file_name
         apartment_list = findrecord(file_name)
         apartment_no = input("Which Apartment No.'s Data do you wish to view? (Enter Apartment No.)\n")
         for aprtmnt_data in apartment_list:
@@ -205,6 +235,8 @@ def view_apartment_data():
                 print("Apartment No.            :", aprtmnt_data[0])
                 print("Apartment Square Footage :", aprtmnt_data[1])
                 print("Rent Amount              :", aprtmnt_data[2], "\n")
+                auditsearchdata(datatype, apartment_no)
+
         option = input("Do you want to search for another apartment data(1), search for another type of data(2) or return to Main Menu(3)?\n")
         if option == "1":
             continue
@@ -223,9 +255,16 @@ def findrecord(file_name):
             data.append(item)
         return data
 
+def auditsearchdata(datatype,name):
+    dnt = currentdatetime()
+    data = (dnt + datatype + " data of " + name + " has been searched")
+    with open("audit", "a") as record:
+        record.write(data + "\n")
+
 def view_tenant_data():
     while True:
         file_name = "tenant"
+        datatype = file_name
         tenant_list = findrecord(file_name)
         tenant_id_number = input("Which Tenant's Data do you wish to view? (Enter Tenant ID No.)\n")
         for tenantdata in tenant_list:
@@ -240,6 +279,7 @@ def view_tenant_data():
                 print("Tenant Current Job   :", tenantdata[7])
                 print("Date of Acquisition  :", tenantdata[8])
                 print("Apartment No.        :", tenantdata[9], "\n")
+                auditsearchdata(datatype, tenant_id_number)
 
         option = input("Do you want to search for another Tenant Data(1), search for another type of data(2) or return to Main Menu(3)?\n")
         if option == "1":
@@ -254,6 +294,7 @@ def view_tenant_data():
 def view_payment_data():
     while True:
         file_name = "payment"
+        datatype = file_name
         payment_list = findrecord(file_name)
         tenant_id_number = input("Which Payment Data do you wish to view? (Enter Tenant ID No.)\n")
         for paymentdata in payment_list:
@@ -263,6 +304,7 @@ def view_payment_data():
                 print("Apartment No.    :", paymentdata[2])
                 print("Amount Paid      :", paymentdata[3])
                 print("Payment Status   :", paymentdata[4], "\n")
+                auditsearchdata(datatype, tenant_id_number)
 
         option = input("Do you want to search for another Payment Data(1), search for another type of data(2) or return to Main Menu(3)?\n")
         if option == "1":
@@ -304,16 +346,20 @@ def showapdata(record, column):
             replacement = input("What do you want to replace the data with?\n")
             return selection, replacement
 
-def replacedata(column, data, selection, replacement, file_name):
-    for record in data:
-        if column == record[0]:
-            record[selection] = replacement
+def replacedata(column, record, selection, replacement, file_name):
+    datatype = file_name
+    for data in record:
+        if column == data[0]:
+            data[selection] = replacement
+            auditmodifydata(datatype, data[0])
 
     with open(file_name, "w") as records:
-        for record in data:
-            for item in record:
+        for data in record:
+            for item in data:
                 records.write(item + ",")
             records.write("\n")
+
+    print("Data Modified")
 
 def modify_tenant_data():
     while True:
@@ -331,6 +377,12 @@ def modify_tenant_data():
         elif option == "3":
             i = 1
             return i
+
+def auditmodifydata(datatype,name):
+    dnt = currentdatetime()
+    data = (dnt + datatype + " data of " + name + " has been modify")
+    with open("audit", "a") as record:
+        record.write(data + "\n")
 
 def showtndata(record, column):
     for data in record:
@@ -384,5 +436,118 @@ def showpmdata(record, column):
             replacement = input("What do you want to replace the data with?\n")
             return selection, replacement
 
+def remove_apartment_data():
+    while True:
+        file_name = "apartment"
+        apartment_record = findrecord(file_name)
+        apartment_no = input("Which Apartment Data do you wish to Delete? (Enter Apartment No.)\n")
+        for apdata in apartment_record:
+            if apdata[0] == apartment_no:
+                print("The matching data for", apartment_no, " is found:\n")
+                print("Apartment No.            :", apdata[0])
+                print("Apartment Square Footage :", apdata[1])
+                print("Rent Amount              :", apdata[2], "\n")
+                verification = input("Does the data shown matches your findings? If yes, enter 'X'\n")
+                if verification.lower() == "x":
+                    confirmation = input("Do you wish to remove the displayed data? If yes, enter 'X'\n")
+                    if confirmation.lower() == "x":
+                        apartment_record.remove(apdata)
+                        deletedata(file_name, apartment_record, apdata[0])
+        option = input("Do you want to delete other Apartment Data(1), delete another type of data(2) or return to Main Menu(3)?\n")
+        if option == 1:
+            continue
+        elif option == "2":
+            i = 5
+            return i
+        elif option == "3":
+            i = 1
+            return i
+
+def deletedata(file_name,record, name):
+    datatype = file_name
+    with open(file_name, "w") as updateData:
+        for data in record:
+            for item in data:
+                updateData.write(item + ",")
+            updateData.write("\n")
+        print("Data Deleted")
+        auditdeletedata(datatype, name)
+
+def auditdeletedata(datatype,name):
+    dnt = currentdatetime()
+    data = (dnt + datatype + " data of " + name + " has been deleted")
+    with open("audit", "a") as record:
+        record.write(data + "\n")
+
+def remove_tenant_data():
+    while True:
+        file_name = "tenant"
+        tenant_record = findrecord(file_name)
+        tnid_no = input("Which Tenant's Data do you wish to Delete? (Enter Tenant ID No.)\n")
+        for tndata in tenant_record:
+            if tndata[0] == tnid_no:
+                print("The matching data for", tnid_no, " is found:\n")
+                print("1. Tenant ID No.        :", tndata[0])
+                print("2. Full Tenant Name     :", tndata[1])
+                print("3. Tenant Gender        :", tndata[2])
+                print("4. Tenant Phone Number  :", tndata[3])
+                print("5. Tenant Address       :", tndata[4])
+                print("6. Tenant City          :", tndata[5])
+                print("7. Tenant Job History   :", tndata[6])
+                print("8. Tenant Current Job   :", tndata[7])
+                print("9. Date of Acquisition  :", tndata[8])
+                print("10. Apartment No.       :", tndata[9], "\n")
+                verification = input("Does the data shown matches your findings? If yes, enter 'X'\n")
+                if verification.lower() == "x":
+                    confirmation = input("Do you wish to remove the displayed data? If yes, enter 'X'\n")
+                    if confirmation.lower() == "x":
+                        tenant_record.remove(tndata)
+                        deletedata(file_name, tenant_record,tndata[0])
+        option = input("Do you want to delete other Tenant Data(1), delete another type of data(2) or return to Main Menu(3)?\n")
+        if option == 1:
+            continue
+        elif option == "2":
+            i = 5
+            return i
+        elif option == "3":
+            i = 1
+            return i
+
+def remove_payment_data():
+    while True:
+        file_name = "payment"
+        payment_record = findrecord(file_name)
+        tnid_no = input("Which Tenant's Payment Data do you wish to Delete? (Enter Tenant ID No.)\n")
+        for pmdata in payment_record:
+            if pmdata[0] == tnid_no:
+                print("The matching data for", tnid_no, " is found:\n")
+                print("1. Tenant ID No.    :", pmdata[0])
+                print("2. Tenant Name      :", pmdata[1])
+                print("3. Apartment No.    :", pmdata[2])
+                print("4. Amount Paid      :", pmdata[3])
+                print("5. Payment Status   :", pmdata[4], "\n")
+                verification = input("Does the data shown matches your findings? If yes, enter 'X'\n")
+                if verification.lower() == "x":
+                    confirmation = input("Do you wish to remove the displayed data? If yes, enter 'X'\n")
+                    if confirmation.lower() == "x":
+                        payment_record.remove(pmdata)
+                        deletedata(file_name, payment_record, pmdata[0])
+        option = input("Do you want to delete other Payment Data(1), delete another type of data(2) or return to Main Menu(3)?\n")
+        if option == 1:
+            continue
+        elif option == "2":
+            i = 5
+            return i
+        elif option == "3":
+            i = 1
+            return i
+
+def auditlogout(username):
+    dnt = currentdatetime()
+    data = (dnt + username + " has log out ")
+    with open("audit", "a") as record:
+        record.write(data + "\n")
+
+from datetime import datetime
 import time
 login()
