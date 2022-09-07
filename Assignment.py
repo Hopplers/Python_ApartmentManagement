@@ -982,13 +982,13 @@ def passwordstrength(password):
         print("Your password's security is average")
     elif 4 < score <= 6:
         print("Your password's security is strong")
-    elif score != 6:
+    if score != 6:
         print("To increase your password's security, make another password with: \n", ",".join(hint))
 
 def securityscore(password):
     score = 0
     hint = []
-    if not password.islower():  #to check the presence of lowercase character
+    if not password.islower():  #to check the presence of uppercase character
         score += 1
     else:
         hint.append("uppercase character")
