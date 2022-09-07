@@ -708,7 +708,7 @@ def modify_payment_data():
     while True:
         file_name = "payment"
         record = findrecord(file_name)
-        column = nosymbols_val("Which Payment Data do you wish to Modify? (Enter Tenant ID No.)\n")
+        column = nosymbols_val("Which Payment Data do you wish to Modify? (Enter Payment ID No.)\n")
         selection, replacement = showpmdata(record, column)
         if selection is None and replacement is None:
             pass
@@ -729,8 +729,8 @@ def showpmdata(record, column):
     replacement = None
     flag = False
     for data in record:
-        while data[1] == column:
-            print("The current data available for the Payment you wish to modify is:\n")
+        while data[0] == column:
+            print("The current data available for the Payment No. you wish to modify is:\n")
             print("1. Payment ID No.   :", data[0])
             print("2. Tenant ID No.    :", data[1])
             print("3. Apartment No.    :", data[2])
@@ -745,16 +745,16 @@ def showpmdata(record, column):
             print("Payment ID No. could not be changed, please try again")
             time.sleep(0.5)
             pass
-        if selection == 1:
+        elif selection == 1:
             replacement = nosymbols_val("What do you want to replace the data with?\n")
             return selection, replacement
-        if selection == 2:
+        elif selection == 2:
             replacement = noempty_val("What do you want to replace the data with?\n")
             return selection, replacement
-        if selection == 3:
+        elif selection == 3:
             replacement = numbers_val("What do you want to replace the data with?\n")
             return selection, replacement
-        if selection == 4:
+        elif selection == 4:
             replacement = month_val("What do you want to replace the data with (MM/YY)?\n")
             return selection, replacement
     else:
@@ -801,9 +801,9 @@ def deletedata(file_name, record, name):
             for item in data:
                 updateData.write(item + ",")
             updateData.write("\n")
-        print("Data Deleted")
-        time.sleep(0.5)
-        auditdeletedata(datatype, name)
+    print("Data Deleted")
+    time.sleep(0.5)
+    auditdeletedata(datatype, name)
 
 def auditdeletedata(datatype, name):
     dnt = currentdatetime()
