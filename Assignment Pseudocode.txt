@@ -1,0 +1,1473 @@
+FUNCTION login()
+    DECLARE flag AS BOOLEAN
+    DECLARE file_name, username, passwrd, password AS STRING
+    DECLARE userpw AS ARRAY
+    DECLARE option AS INTEGER
+
+    WHILE True
+        SET flag AS False
+        SET file_name AS "userpw"
+        DISPLAY("Log-in Page")
+        username = CALL FUNCTION characters_val("Username: ")
+        userpw = CALL FUNCTION findrecord(file_name)
+        FOR EACH data IN userpw
+            IF data[0] IS EQUAL TO username THEN
+                IF data[1] ID EQUAL TO BLANKS THEN
+                    flag = True
+                    DISPLAY("Welcome new user")
+                    WHILE flag IS EQUAL TO True
+                        passwrd = noempty_val("As a startup, please insert a desirable password for your account")
+                        CALL FUNCTION passwordstrength(passwrd)
+                        option = CALL FUNCTION options_val("Do you want to save the password(1) or use another password(2)?", 2)
+                        IF option IS EQUAL TO 1 THEN
+                            SET data[1] AS passwrd
+                            CALL FUNCTION replacedatatofile(file_name, userpw)
+                            DISPLAY("Password saved!")
+                            CALL FUNCTION auditsetup(username)
+                            DISPLAY("Redirecting you to Log In page")
+                            BREAK
+                        ELSE IF option IS EQUAL TO 2 THEN
+                            PASS
+                        ENDIF
+                    ENDWHILE
+                ELSE THEN
+                    password = CALL FUNCTION noempty_val("Password: ")
+                    SET flag AS True
+                    IF data[1] IS EQUAL TO password
+                        CALL FUNCTION auditlogin(username)
+                        IF data[2] IS EQUAL TO "superadmin" THEN
+                            CALL FUNCTION smainmenu(username)
+                            BREAK
+                        ELSE IF data[2] IS EQUAL TO "admin" THEN
+                            CALL FUNCTION amainmenu(username)
+                            BREAK
+                        ELSE IF data[2] IS EQUAL TO "tenant" THEN
+                            CALL FUNCTION tmainmenu(username)
+                            BREAK
+                        ENDIF
+                    ELSE THEN
+                        DISPLAY("Incorrect password, please try again")
+                ENDIF
+            ENDIF
+        ENDFOR
+        IF flag IS EQUAL TO False
+            DISPLAY("Incorrect username, please try again")
+            CONTINUE
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION auditsetup(username)
+	DECLARE dnt, data AS STRING
+
+	dnt = CALL FUNCTION currentdatetime()
+	SET data AS (dnt + username + " has set up his/her account ")
+	OPEN "audit" IN APPEND MODE AS record THEN
+		WRITE data WITH "\n" IN record
+ENDFUNCTION
+
+FUNCTION auditlogin(username)
+	DECLARE dnt, data AS STRING
+
+	dnt = CALL FUNCTION currentdatetime()
+	SET data AS (dnt + username + " has log in ")
+	OPEN "audit" IN APPEND MODE AS record THEN
+		WRITE data WITH "\n" IN record
+ENDFUNCTION
+
+FUNCTION currentdatetime()
+    DECLARE now, dnt AS STRING
+    SET now AS CURRENT DATE
+    CONVERT now AS dnt USING FORMAT ("[day/month/year] hour:minute:second")
+    RETURN dnt
+ENDFUNCTION
+
+FUNCTION smainmenu(username)
+	DECLARE status AS STRING
+
+	SET status AS "superadmin"
+	DISPLAY (username, ", Welcome to D&J Tenant Management System")
+	SET i AS 1
+	WHILE TRUE
+		IF i IS EQUALS TO 1 THEN
+			i = CALL FUNCTION smainmenuselect()
+		ELSE IF i IS EQUALS TO 2 THEN
+			i = CALL FUNCTION view_audit_log()
+		ELSE IF i IS EQUALS TO 3 THEN
+			i = CALL FUNCTION new_user(status, None)
+		ELSE IF i IS EQUALS TO 4 THEN
+			i = CALL FUNCTION userpasswordreset(status)
+		ELSE IF i IS EQUALS TO 5 THEN
+			DISPLAY ("Goodbye!")
+			CALL FUNCTION auditlogout(username)
+			BREAK
+		ENDIF
+	ENDWHILE
+ENDFUNCTION
+
+FUNCTION smainmenuselect()
+	DECLARE option AS STRING
+
+	option = CALL FUNCTION options_val("Please select an option 1. View Audit Log 2. Add New Admin 3. Change Username or Password 4. Log out", 5)
+	SET i AS option + 1
+	RETURN i
+ENDFUNCTION
+
+FUNCTION view_audit_log()
+	DECLARE file_name, random AS STRING
+	DECLARE record AS ARRAY
+
+	SET file_name AS "audit"
+	record = CALL FUNCTION findrecord(file_name)
+	DISPLAY ("These are the recent 20 records in audit log:")
+	FOR data IN record[-20]
+		DISPLAY (data[0])
+	ENDFOR
+	random = CALL FUNCTION noempty_val("Enter anything to continue")
+	DISPLAY ("Redirecting you to Main Menu")
+	SET i AS 1
+	RETURN i
+ENDFUNCTION
+
+FUNCTION new_user(status,username)
+	DECLARE file_name, username, position AS STRING
+	DECLARE data, records, details AS ARRAY
+
+	WHILE TRUE
+		SET position AS NONE
+		SET file_name AS "userpw"
+		IF status IS EQUALS TO "superadmin" THEN
+			SET position AS "admin"
+			username = CALL FUNCTION characters_val("Enter the new Username you want to create")
+		ELSE IF status IS EQUALS TO "admin" THEN
+			SET position AS "tenant"
+		ENDIF
+		records = CALL FUNCTION findrecord(file_name)
+		FOR lines IN records
+			IF lines[0] IS EQUALS TO username THEN
+				DISPLAY ("This username has been taken, please enter another username")
+				BREAK
+			ENDIF
+		ELSE THEN
+			SET details AS [username, "", position]
+			APPEND details INTO data
+			CALL FUNCTION savedata(file_name, data, username, position)
+			SET i AS 1
+			RETURN i
+		ENDFOR
+	ENDWHILE
+ENDFUNCTION
+
+FUNCTION amainmenu(username)
+	DECLARE status AS STRING
+	DECLARE i,option AS INTEGER
+
+	SET status AS "admin"
+	DISPLAY(username, ", Welcome to D&J Tenant Management System")
+	SET i AS 1
+	WHILE TRUE
+		IF i IS EQUALS TO 1 THEN
+			i = CALL FUNCTION amainmenuselect()
+
+		ELSE IF i IS EQUALS TO 2 THEN
+			GET option CALL FUNCTION options_val("Which type of New Data? 1. New Apartment Data 2. New Tenant Data 3. New Payment Data 4. Return to Main Menu", 4)
+			IF option IS EQUALS TO 1 THEN
+				i = CALL FUNCTION new_apartment_data()
+			ELSE IF option IS EQUALS TO 2 THEN
+				i = CALL FUNCTION new_tenant_data(status)
+			ELSE IF option IS EQUALS TO 3 THEN
+				i = CALL FUNCTION new_payment_data()
+			ELSE IF option IS EQUALS TO 4 THEN
+				SET i AS 1
+			END IF
+
+		ELSE IF i IS EQUALS TO 3 THEN
+			GET option CALL FUNCTION options_val("Which Data do you wish to search? 1. Apartment Data 2. Tenant Data 3. Payment Data 4. Payment Status 5. Return to Main Menu", 5)
+			IF option IS EQUALS TO 1 THEN
+				i = CALL FUNCTION view_apartment_data()
+			ELSE IF option IS EQUALS TO 2 THEN
+				i = CALL FUNCTION view_tenant_data()
+			ELSE IF option IS EQUALS TO 3 THEN
+				i = CALL FUNCTION view_payment_data()
+			ELSE IF option IS EQUALS TO 4 THEN
+				i = CALL FUNCTION viewpaymentstatus()
+			ELSE IF option IS EQUALS TO 5 THEN
+				SET i AS 1
+			ENDIF
+
+		ELSE IF i IS EQUALS TO 4 THEN
+			GET option CALL FUNCTION options_val("Which Data do you wish to modify? 1. Apartment Data 2. Tenant Data 3. Payment Data 4. Return to Main Menu", 4)
+			IF option IS EQUALS TO 1 THEN
+				i = CALL FUNCTION modify_apartment_data()
+			ELSE IF option IS EQUALS TO 2 THEN
+				i = CALL FUNCTION modify_tenant_data()
+			ELSE IF option IS EQUALS TO 3 THEN
+				i = CALL FUNCTION modify_payment_data()
+			ELSE IF option IS EQUALS TO 4 THEN
+				SET i AS 1
+			ENDIF
+
+		ELSE IF i IS EQUALS TO 5 THEN
+			GET option CALL FUNCTION options_val("Which Data do you wish to delete? 1. Apartment Data 2. Tenant Data 3. Payment Data 4. Return to Main Menu", 4)
+			IF option IS EQUALS TO 1 THEN
+				i = CALL FUNCTION remove_apartment_data()
+			ELSE IF option IS EQUALS TO 2 THEN
+				i = CALL FUNCTION remove_tenant_data()
+			ELSE IF option IS EQUALS TO 3 THEN
+				i = CALL FUNCTION remove_payment_data()
+			ELSE IF option IS EQUALS TO 4 THEN
+				SET i AS 1
+			ENDIF
+
+		ELSE IF i IS EQUALS TO 6 THEN
+			i = CALL FUNCTION userpasswordreset(status)
+
+		ELSE IF i IS EQUALS TO 7 THEN
+			DISPLAY ("Goodbye!")
+			CALL FUNCTION auditlogout(username)
+			BREAK
+		ENDIF
+	ENDWHILE
+ENDFUNCTION
+
+FUNCTION amainmenuselect()
+	DECLARE option AS INTEGER
+
+	option = CALL FUNCTION options_val("Please select an option 1. Enter New Data 2. Search Current Available Data 3. Modify Current Available Data 4. Delete Current Available Data 5. Change Username or Password 6. Log Out ", 6)
+	SET i AS option + 1
+	RETURN i
+ENDFUNCTION
+
+FUNCTION tmainmenu(username)
+	DECLARE status AS STRING
+	DECLARE i, option AS INTEGER
+
+	SET status AS "tenant"
+	DISPLAY (username, ", Welcome to D&J Tenant Management System")
+	SET i AS 1
+	WHILE TRUE
+		IF i IS EQUALS TO 1 THEN
+			i = CALL FUNCTION tmainmenuselect()
+
+		ELSE IF i IS EQUALS TO 2 THEN
+			option = CALL FUNCTION options_val("Which Data do you wish to search? 1. Apartment Data 2. Tenant Data 3. Payment Data 4. Payment Status 5. Return to Main Menu", 5)
+			IF option IS EQUALS TO 1 THEN
+				i = CALL FUNCTION view_apartment_data()
+			ELSE IF option IS EQUALS TO 2 THEN
+				i = CALL FUNCTION view_tenant_data()
+			ELSE IF option IS EQUALS TO 3 THEN
+				i = CALL FUNCTION view_payment_data()
+			ELSE IF option IS EQUALS TO 4 THEN
+				i = CALL FUNCTION viewpaymentstatus()
+			ELSE IF option IS EQUALS TO 5 THEN
+				SET i AS 1
+			ENDIF
+
+		ELSE IF i IS EQUALS TO 3 THEN
+			i = CALL FUNCTION userpasswordreset(status)
+
+		ELSE IF i IS EQUALS TO 4 THEN
+			DISPLAY ("Goodbye!")
+			CALL FUNCTION auditlogout(username)
+			BREAK
+		ENDIF
+	ENDWHILE
+ENDFUNCTION
+
+FUNCTION tmainmenuselect()
+	DECLARE option AS INTEGER
+
+	option = CALL FUNCTION options_val("Please select an option 1. Search Current Available Data 2. Change Username or Password 3. Log Out ", 3)
+	SET i AS option + 1
+	RETURN i
+ENDFUNCTION
+
+FUNCTION new_apartment_data()
+	DECLARE file_name, apartment_no, date_of_acquisition AS STRING
+	DECLARE apartment_square_footage, rent_amount, option AS INTEGER
+	DECLARE apartment_data, details_apartment AS ARRAY
+
+	WHILE TRUE
+		SET file_name AS "apartment"
+		apartment_no = CALL FUNCTION noempty_val("Enter Apartment No.:")
+		IF CALL FUNCTION isAvailable(file_name, 0, apartment_no) IS EQUAL TO True THEN
+			DISPLAY ("This data has already been added, enter other data")
+		ELSE THEN
+			date_of_acquisition = CALL FUNCTION date_val("Enter Date of Acquisition(DD/MM/YY): ")
+			apartment_square_footage = CALL FUNCTION numbers_val("Enter Apartment Square Footage: ")
+			rent_amount = CALL FUNCTION numbers_val("Enter Rent Amount: ")
+			details_apartment = [apartment_no, date_of_acquisition, apartment_square_footage, rent_amount]
+			APPEND details_apartment IN apartment_data
+			CALL FUNCTION savedata(file_name, apartment_data, apartment_no, "")
+			option = CALL FUNCTION option_val("Do you want to enter another apartment data(1), enter another type of new data(2) or return to Main Menu(3)?", 3)
+			IF option IS EQUALS TO 1 THEN
+				CONTINUE
+			ELSE IF option IS EQUALS TO 2 THEN
+				SET i EQUALS TO 2
+				RETURN i
+			ELSE IF option IS EQUALS TO 3 THEN
+				SET i EQUALS TO 1
+				RETURN i
+			ENDIF
+        ENDIF
+	ENDWHILE
+ENDFUNCTION
+
+FUNCTION isAvailable(file_name, position, text)
+	DECLARE data AS STRING
+	DECLARE records AS ARRAY
+
+	SET data AS text
+	records = CALL FUNCTION findrecord(file_name)
+	FOR lines IN records
+		IF lines[position] IS EQUALS TO data THEN
+			RETURN TRUE
+		ENDIF
+	ENDFOR
+	RETURN FALSE
+ENDFUNCTION
+
+FUNCTION savedata(file_name, data, name, status)
+	DECLARE datatype AS STRING
+
+	SET datatype AS file_name
+	OPEN file_name IN APPEND MODE AS records
+		FOR record IN data
+			FOR item in record
+				WRITE item WITH "," IN records
+			ENDFOR
+			WRITE "\n" IN records
+		ENDFOR
+		IF datatype IS NOT EQUALS TO "userpw" AND datatype IS NOT EQUALS TO "paymentstatus" THEN
+			CALL FUNCTION auditnewdata(datatype, name)
+			DISPLAY ("Data Saved.")
+		ELSE IF datatype IS EQUALS TO "userpw" THEN
+			CALL FUNCTION auditnewuser(status, name)
+			DISPLAY ("New username, " + name + " is created")
+		ELSE IF datatype IS EQUALS TO "paymentstatus" THEN
+			CALL FUNCTION auditpaystatus(name)
+			DISPLAY ("Payment Status updated")
+		ENDIF
+ENDFUNCTION
+
+FUNCTION auditnewdata(datatype, name)
+	DECLARE dnt, data AS STRING
+
+	dnt = CALL FUNCTION currentdatetime()
+	SET data AS (dnt + "new " + datatype + " data for " + name + " has been added")
+	OPEN "audit" IN APPEND MODE AS record
+		WRITE data WITH "\n" IN record
+ENDFUNCTION
+
+FUNCTION auditnewuser(status,name)
+	DECLARE dnt, data AS STRING
+
+	dnt = CALL FUNCTION currentdatetime()
+	SET data AS (dnt +"new user " + name + " has been added as " + status)
+	OPEN "audit" IN APPEND MODE AS record
+		WRITE data WITH "\n" IN record
+ENDFUNCTION
+
+FUNCTION auditpaystatus(name)
+	DECLARE dnt, data AS STRING
+
+	dnt = CALL FUNCTION currentdatetime()
+	SET data AS (dnt + "payment status for " + name + " has been updated")
+	OPEN "audit" IN APPEND MODE AS record
+		WRITE data WITH "\n" IN record
+ENDFUNCTION
+
+FUNCTION new_tenant_data(status)
+	DECLARE file_name, newnumb, id_number, full_name, gender, address, city, job_history, current_job, apartment_no, date_of_rent AS STRING
+	DECLARE phone_number, option AS INTEGER
+	DECALRE tenant_data, details_tenant AS ARRAY
+
+	WHILE TRUE
+		SET file_name AS "tenant"
+		newnumb = CALL FUNCTION newnumbgen("tenant_count")
+		SET id_number AS "TN" WITH newnumb
+		full_name = CALL FUNCTION characters_val("Enter Full Name: ")
+		IF CALL FUNCTION isAvailable(file_name, 1, full_name) IS EQUAL TO True THEN
+			DISPLAY ("The data for " + full_name + " has already been added, please enter other name")
+			CONTINUE
+		ELSE THEN
+			gender = CALL FUNCTION characters_val("Enter Gender: ")
+			phone_number = CALL FUNCTION numbers_val("Enter Phone Number: ")
+			address = CALL FUNCTION noempty_val("Enter address: ")
+			city = CALL FUNCTION characters_val("Enter City: ")
+			job_history = CALL FUNCTION characters_val("Enter Job History: ")
+			current_job = CALL FUNCTION characters_val("Enter Current Job: ")
+			WHILE TRUE
+				apartment_no = CALL FUNCTION noempty_val("Enter Apartment No.: ")
+				IF CALL FUNCTION isAvailable("apartment", 0, apartment_no) IS EQUAL TO False THEN
+					DISPLAY ("This Apartment no. does not exist, please re-enter the Apartment no.")
+					CONTINUE
+				ELSE THEN
+					date_of_rent = CALL FUNCTION date_val("Enter Date of Rent(DD/MM/YY): ")
+					SET details_tenant AS [id_number, full_name, gender, phone_number, address, city, job_history, current_job, apartment_no, date_of_rent]
+					APPEND details_tenant IN tenant_data
+					CALL FUNCTION savedata(file_name, tenant_data, id_number, "")
+					CALL FUNCTION new_user(status, full_name)
+					option = CALL FUNCTION options_val("Do you want to enter another tenant data(1), enter another type of new data(2) or return to Main Menu(3)?", 3)
+					IF option IS EQUALS TO 1 THEN
+						BREAK
+					ELSE IF option IS EQUALS TO 2 THEN
+						SET i AS 2
+						RETURN i
+					ELSE IF option IS EQUALS TO 3 THEN
+						SET i AS 1
+						RETURN i
+					ENDIF
+				ENDIF
+			ENDWHILE
+		ENDIF
+	ENDWHILE
+ENDFUNCTION
+
+FUNCTION newnumbgen(file_name)
+	DECLARE lines, newnumb AS STRING
+
+	lines = CALL FUNCTION fileline(file_name)
+	SET newnumb AS (lines + 1)
+	OPEN file_name IN APPEND MODE AS records
+		WRITE newnumb WITH "\n" INTO records
+	RETURN newnumb
+ENDFUNCTION
+
+FUNCTION fileline(file_name)
+	DECLARE lines AS INTEGER
+
+	SET lines AS 0
+	OPEN file_name IN READ MODE AS records
+		FOR line IN records
+			lines = lines + 1
+		RETURN lines
+ENDFUNCTION
+
+FUNCTION new_payment_data()
+	DECLARE file_name, newnumb, payment_id, tenant_id, apartment_no, payment_month AS STRING
+	DECLARE amount_paid, option AS INTEGER
+	DECLARE payment_data, details_payment AS ARRAY
+
+	WHILE TRUE
+		SET file_name AS "payment"
+		newnub = CALL FUNCTION newnumbgen("payment_count")
+		SET payment_id AS "PM" WITH newnumb
+		tenant_id = CALL FUNCTION nosymbols_val("Enter Tenant ID No.: ")
+		IF NOT CALL FUNCTION ("tenant", 0, tenant_id) THEN
+			DISPLAY ("This Tenant ID no. does not exist, please re-enter the Tenant ID no.")
+			CONTINUE
+		ELSE THEN
+			WHILE TRUE THEN
+				apartment_no = CALL FUNCTION noempty_val("Enter Apartment No.: ")
+				IF NOT CALL FUNCTION isAvailable("apartment", 0, apartment_no) THEN
+					DISPLAY ("This Apartment No. does not exist, please re-enter the Apartment No.")
+					CONTINUE
+				ELSE THEN
+					amount_paid = CALL FUNCTION numbers_val("Enter Amount Paid: ")
+					payment_month = CALL FUNCTION month_val("Enter Payment Month (MM/YY): ")
+					SET details_payment AS [payment_id, tenant_id, apartment_no, amount_paid, payment_month]
+					APPEND details_payment IN payment_data
+					CALL FUNCTION savedata(file_name, payment_data, tenant_id, "")
+					CALL FUNCTION paymentstatus(payment_month, tenant_id, apartment_no, amount_paid)
+					option = CALL FUNCTION options_val("Do you want to enter another payment data(1), enter another type of new data(2) or return to Main Menu(3)?", 3)
+					IF option IS EQUALS TO 1 THEN
+						BREAK
+					ELSE IF option IS EQUALS TO 2 THEN
+						SET i AS 2
+						RETURN i
+					ELSE IF option IS EQUALS TO 3 THEN
+						SET i AS 1
+						RETURN i
+					ENDIF
+				ENDIF
+			ENDWHILE
+		ENDIF
+	ENDWHILE
+ENDFUNCTION
+
+FUNCTION paymentstatus(payment_month, tenant_id, apartment_no, amount_paid)
+	DECLARE flag AS BOOLEAN
+	DECLARE data, paystatus_records, apartment_records AS ARRAY
+	DECLARE rentalfee, file_name AS STRING
+	DECLARE total_paid AS INTEGER
+
+	SET flag AS FALSE
+	SET rentalfee AS NONE
+	SET file_name AS "paymentstatus"
+	paystatus_records = CALL FUNCTION findrecord(file_name)
+	apartment_records = CALL FUNCTION findrecord("apartment")
+	FOR lines IN apartment_records
+		WHILE apartment_no IS EQUALS TO lines[0]
+			SET rentalfee AS lines[3]
+			BREAK
+		ENDWHILE
+	ENDFOR
+
+	FOR lines IN paystatus_records
+		WHILE payment_month IS EQUALS TO lines[0] AND tenant_id IS EQUALS TO lines[1] AND apartment_no IS EQUALS TO lines[2]
+			DECLARE lines[4], amount_paid AS INTEGER
+			total_paid = lines[4] + amount_paid
+			DECLARE total_paid AS STRING
+			SET lines[4] AS total_paid
+			DECLARE lines[3], lines[4] AS INTEGER
+			IF lines[4] IS MORE THAN OR EQUALS TO lines[3] THEN
+				SET lines[5] AS "paid"
+			ELSE THEN
+				PASS
+			ENDIF
+			CALL FUNCTION replacedatatofile(file_name, paystatus_records)
+			CALL FUNCTION auditpaystatus(tenant_id)
+			DISPLAY ("Payment Status updated")
+			SET flag AS TRUE
+			BREAK
+		ENDWHILE
+	ENDFOR
+
+	IF flag IS EQUALS TO FALSE THEN
+		IF amount_paid IS MORE THAN OR EQUALS TO rentalfee THEN
+			SET paymentstatus AS "paid"
+		ELSE THEN
+			SET paymentstatus AS "unpaid"
+		ENDIF
+		SET details = (payment_month, tenant_id, apartment_no, rentalfee, amount_paid, paymentstatus)
+		APPEND details IN data
+		CALL FUNCTION savedata(file_name,data, tenant_id,"")
+	ENDIF
+ENDFUNCTION
+
+FUNCTION view_apartment_data()
+	DECLARE file_name, datatype, apartment_noAS STRING
+	DECLARE flag AS BOOLEAN
+	DECLARE apartment_list AS ARRAY
+	DECLARE option AS INTEGER
+
+	WHILE TRUE
+		SET flag AS FALSE
+		SET file_name AS "apartment"
+		SET datatype AS file_name
+		apartment_list = CALL FUNCTION findrecord(file_name)
+		apartment_no = CALL FUNCTION noempty_val("Which Apartment No.'s Data do you wish to view? (Enter Apartment No.)")
+		FOR aprtmnt_data IN apartment_list
+			IF aprtmnt_data[0] IS EQUALS TO apartment_no THEN
+				DISPLAY ("The current data available for the Apartment No. ", apartment_no, " is:")
+				DISPLAY ("Apartment No.            :", aprtmnt_data[0])
+				DISPLAY ("Date of Acquisition.     :", aprtmnt_data[1])
+				DISPLAY ("Apartment Square Footage :", aprtmnt_data[2])
+				DISPLAY ("Rent Amount              :", aprtmnt_data[3])
+				CALL FUNCTION auditsearchdata(datatype, apartment_no)
+				SET flag AS TRUE
+			ENDIF
+		ENDFOR
+		IF flag IS EQUALS TO TRUE THEN
+			option = CALL FUNCTION options_val("Do you want to search for another apartment data(1), search for another type of data(2) or return to Main Menu(3)?", 3)
+			IF option IS EQUALS TO 1 THEN
+				CONTINUE
+			ELSE IF option IS EQUALS TO 2 THEN
+				SET i AS 3
+				RETURN i
+			ELSE IF option IS EQUALS TO 3 THEN
+				SET i AS 1
+				RETURN i
+			ENDIF
+		ELSE THEN
+			DISPLAY ("No matching data found")
+		ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION findrecord(file_name)
+	DECLARE record, item AS ARRAY
+
+	OPEN file_name IN READ MODE AS records
+		FOR line IN records
+			REMOVE LEADING AND TRAILING BLANKS FROM line
+			REMOVE LEADING AND TRAILING "," FROM line
+			CONVERT line INTO ARRAY AS item USING "," AS A DELIMITER
+			APPEND item IN record
+		ENDFOR
+		RETURN record
+ENDFUNCTION
+
+FUNCTION auditsearchdata(datatype, name)
+	DECLARE dnt, data AS STRING
+
+	dnt = CALL FUNCTION currentdatetime()
+	SET data AS (dnt + datatype + " data of " + name + " has been searched")
+	OPEN "audit" IN APPEND MODE AS record
+		WRITE data WITH "/n" IN record
+ENDFUNCTION
+
+FUNCTION view_tenant_data()
+	DECLARE file_name, datatype, tenant_id_number AS STRING
+	DECLARE tenant_list AS ARRAY
+	DECLARE flag AS BOOLEAN
+	DECLARE option AS INTEGER
+
+	WHILE TRUE
+		SET flag AS FALSE
+		SET file_name AS "tenant"
+		SET datatype AS file_name
+		tenant_list = CALL FUNCTION findrecord(file_name)
+		tenant_id_number = CALL FUNCTION nosymbols_val("Which Tenant's Data do you wish to view? (Enter Tenant ID No.)")
+		FOR tenantdata IN tenant_list
+			IF tenantdata[0] IS EQUALS TO tenant_id_number THEN
+				DISPLAY ("Tenant ID No.        :", tenantdata[0])
+				DISPLAY ("Full Tenant Name     :", tenantdata[1])
+				DISPLAY ("Tenant Gender        :", tenantdata[2])
+				DISPLAY ("Tenant Phone Number  :", tenantdata[3])
+				DISPLAY ("Tenant Address       :", tenantdata[4])
+				DISPLAY ("Tenant City          :", tenantdata[5])
+				DISPLAY ("Tenant Job History   :", tenantdata[6])
+				DISPLAY ("Tenant Current Job   :", tenantdata[7])
+				DISPLAY ("Apartment No.        :", tenantdata[8])
+				DISPLAY ("Date of Rent         :", tenantdata[9])
+				CALL FUNCTION auditsearchdata(datatype, tenant_id_number)
+				SET flag AS TRUE
+			ENDIF
+		ENDFOR
+
+		IF FLAG IS EQUALS TRUE THEN
+			option = CALL FUNCTION options_val("Do you want to search for another Tenant Data(1), search for another type of data(2) or return to Main Menu(3)?", 3)
+			IF option IS EQUALS TO 1 THEN
+				CONTINUE
+			ELSE IF option IS EQUALS TO 2 THEN
+				SET i AS 3
+				RETURN i
+			ELSE IF option IS EQUALS TO 3 THEN
+				SET i AS 1
+				RETURN i
+			ENDIF
+		ELSE THEN
+			DISPLAY ("No matching data found")
+		ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION view_payment_data()
+	DECLARE file_name, datatype, tenant_id_number AS STRING
+	DECLARE flag AS BOOLEAN
+	DECLARE payment_list AS ARRAY
+	DECLARE option as INTEGER
+
+	WHILE TRUE
+		SET flag AS FALSE
+		SET file_name AS "payment"
+		SET datatype AS file_name
+		payment_list = CALL FUNCTION findrecord(file_name)
+		tenant_id_number = CALL FUNCTION nosymbols_val("Which Payment Data do you wish to view? (Enter Tenant ID No.)")
+		FOR paymentdata IN payment_list
+			IF payment_data[1] IS EQUALS TO tenant_id_number THEN
+				DISPLAY ("Payment ID No.   :", paymentdata[0])
+				DISPLAY ("Tenant ID No.    :", paymentdata[1])
+				DISPLAY ("Apartment No.    :", paymentdata[2])
+				DISPLAY ("Amount Paid      :", paymentdata[3])
+				DISPLAY ("Payment Month    :", paymentdata[4])
+				CALL FUNCTION auditsearchdata(datatype, tenant_id_number)
+				SET flag AS TRUE
+			ENDIF
+		ENDFOR
+
+		IF flag IS EQUALS TRUE THEN
+			option = CALL FUNCTION options_val("Do you want to search for another Payment Data(1), search for another type of data(2) or return to Main Menu(3)?", 3)
+			IF option IS EQUALS TO 1 THEN
+				CONTINUE
+			ELSE IF option IS EQUALS TO 2 THEN
+				SET i AS 3
+				RETURN i
+			ELSE IF option IS EQUALS TO 3 THEN
+				SET i AS 1
+				RETURN i
+			ENDIF
+		ELSE THEN
+			DISPLAY ("No matching data found")
+		ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION viewpaymentstatus()
+	DECLARE flag AS BOOLEAN
+	DECLARE file_name, datatype, tenant_id_number AS STRING
+	DECLARE records AS ARRAY
+	DECALRE option AS INTEGER
+
+	WHILE TRUE
+		SET flag AS FALSE
+		SET file_name AS "paymentstatus"
+		SET datatype AS file_name
+		records = CALL FUNCTION findrecord(file_name)
+		tenant_id_number = CALL FUNCTION nosymbols_val("Which Payment Data do you wish to view? (Enter Tenant ID No.)")
+		FOR lines IN records
+			IF lines[1] IS EQUALS TO tenant_id_number THEN
+				DISPLAY ("Payment Month    :", lines[0])
+				DISPLAY ("Tenant ID No.    :", lines[1])
+				DISPLAY ("Apartment No.    :", lines[2])
+				DISPLAY ("Rental Fee       :", lines[3])
+				DISPLAY ("Amount Paid      :", lines[4])
+				DISPLAY ("Payment Status   :", lines[5])
+				CALL FUNCTION auditsearchdata(datatype, tenant_id_number)
+				SET flag AS TRUE
+			ENDIF
+		ENDFOR
+
+		IF flag IS EQUALS TRUE THEN
+			option = CALL FUNCTION options_val("Do you want to search for another Payment Data(1), search for another type of data(2) or return to Main Menu(3)?", 3)
+			IF option IS EQUALS TO 1 THEN
+				CONTINUE
+			ELSE IF option IS EQUALS TO 2 THEN
+				SET I AS 3
+				RETURN i
+			ELSE IF option IS EQUALS TO 3 THEN
+				SET i AS 1
+				RETURN i
+			ENDIF
+		ELSE THEN
+			DISPLAY ("No matching data found")
+		ENDIF
+	ENDWHILE
+ENDFUNCTION
+
+FUNCTION modify_apartment_data()
+    DECLARE file_name, column AS STRING
+    DECLARE record AS ARRAY
+    DECLARE option AS INTEGER
+
+    WHILE True
+        SET file_name AS "apartment"
+        record = CALL FUNCTION findrecord(file_name)
+        column = nosymbols_val("Which Apartment Data do you wish to Modify? (Enter Apartment No.)")
+        FROM CALL FUNCTION showapdata(record, column) RETURN VALUES TO selection, replacement
+        IF selection IS EQUAL TO None AND replacement IS EQUAL TO None THEN
+            PASS
+        ELSE THEN
+            CALL FUNCTION replacedata(column, record, selection, replacement, file_name)
+            option = CALL FUNCTION options_val("Do you want to continue modifying Apartment Data(1), modify another type of data(2) or return to Main Menu(3)?", 3)
+            IF option IS EQUAL TO 1 THEN
+                CONTINUE
+            ELSE IF option IS EQUAL TO 2 THEN
+                SET i AS 4
+                RETURN 4
+            ELSE IF option IS EQUAL TO 3 THEN
+                SET i AS 1
+                RETURN i
+            ENDIF
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION showapdata(record, column)
+    DECLARE flag AS BOOLEAN
+    DECLARE replacement AS STRING
+    DECLARE selection AS INTEGER
+
+    SET selection AS None
+    SET replacement AS None
+    SET flag AS False
+    FOR EACH data IN record
+        WHILE data[0] IS EQUAL TO column
+            DISPLAY("The current data available for the Apartment No. you wish to modify is:")
+            DISPLAY("1. Apartment No.            : ", data[0])
+            DISPLAY("2. Date of acquisition      : ", data[1])
+            DISPLAY("3. Apartment Square Footage : ", data[2])
+            DISPLAY("4. Rent Amount              : ", data[3]
+            selection = CALL FUNCTION options_val("Which data do you wish to modify?", 5)
+            selection = selection - 1
+            flag = True
+        ENDWHILE
+    ENDFOR
+    IF flag IS EQUAL TO TRUE THEN
+        IF selection IS EQUAL TO 0 THEN
+            replacement = CALL FUNCTION noempty_val("What do you want to replace the data with?")
+            RETURN selection, replacement
+        ELSE IF selection IS EQUAL TO 1 THEN
+            replacement = CALL FUNCTION date_val("What do you want to replace the data with?")
+            RETURN selection, replacement
+        ELSE IF selection IS EQUAL TO (2 OR 3) THEN
+            replacement = CALL FUNCTION numbers_val("What do you want to replace the data with?")
+            RETURN selection, replacement
+        ENDIF
+    ELSE THEN
+        DISPLAY("No matching data found")
+        RETURN selection, replacement
+    ENDIF
+ENDFUNCTION
+
+FUNCTION replacedata(column, record, selection, replacement, file_name)
+    DECLARE datatype AS STRING
+
+    SET datatype AS file_name
+    FOR EACH data IN record
+        IF column IS EQUAL TO data[0]
+            SET data[selection] AS replacement
+            CALLFUNCTION auditmodifydata(datatype, data[0])
+        ENDIF
+    ENDFOR
+    CALL FUNCTION replacedatatofile(file_name, record)
+    DISPLAY("Data Modified")
+ENDFUNCTION
+
+FUNCTION modify_tenant_data()
+    DECLARE file_name, column AS STRING
+    DECLARE record AS ARRAY
+    DECLARE option AS INTEGER
+
+    WHILE True
+        SET file_name AS "tenant"
+        record = CALL FUNCTION findrecord(file_name)
+        column = nosymbols_val("Which Tenant's Data do you wish to Modify? (Enter Tenant ID No.)")
+        FROM CALL FUNCTION showtndata(record, column) RETURN VALUES TO selection, replacement
+        IF selection IS EQUAL TO None AND replacement IS EQUAL TO None THEN
+            PASS
+        ELSE THEN
+            CALL FUNCTION replacedata(column, record, selection, replacement, file_name)
+            option = CALL FUNCTION options_val("Do you want to continue modifying Tenant Data(1), modify another type of data(2) or return to Main Menu(3)?", 3)
+            IF option IS EQUAL TO 1 THEN
+                CONTINUE
+            ELSE IF option IS EQUAL TO 2 THEN
+                SET i AS 4
+                RETURN 4
+            ELSE IF option IS EQUAL TO 3 THEN
+                SET i AS 1
+                RETURN i
+            ENDIF
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION auditmodifydata(datatype, name)
+    DECLARE dnt, data as STRING
+    
+    dnt = CALL FUNCTION currentdatetime()
+    SET data AS (dnt + datatype + " data of " + name + " has been modify")
+    OPEN "audit" IN APPEND MODE AS record
+        WRITE data WITH "\n" IN record
+ENDFUNCTION
+
+FUNCTION showtndata(record, column)
+    DECLARE flag AS BOOLEAN
+    DECLARE replacement AS STRING
+    DECLARE selection AS INTEGER
+
+    SET selection AS None
+    SET replacement AS None
+    SET flag AS False
+    FOR EACH data IN record
+        WHILE data[0] IS EQUAL TO column
+            DISPLAY("The current data available for the Tenant No. you wish to modify is:")
+            DISPLAY("1. Tenant ID No.         :", data[0])
+            DISPLAY("2. Full Tenant Name      :", data[1])
+            DISPLAY("3. Tenant Gender         :", data[2])
+            DISPLAY("4. Tenant Phone Number   :", data[3])
+            DISPLAY("5. Tenant Address        :", data[4])
+            DISPLAY("6. Tenant City           :", data[5])
+            DISPLAY("7. Tenant Job History    :", data[6])
+            DISPLAY("8. Tenant Current Job    :", data[7])
+            DISPLAY("9. Apartment No.         :", data[8])
+            DISPLAY("10. Date of Rent         :", data[9])
+            selection = CALL FUNCTION options_val("Which data do you wish to modify?", 10)
+            selection = selection - 1
+            flag = True
+        ENDWHILE
+    ENDFOR
+    IF flag IS EQUAL TO TRUE THEN
+        IF selection IS EQUAL TO 0 THEN
+            DISPLAY("Tenant ID No. could not be changed, please try again")
+            PASS
+        ELSE IF selection IS EQUAL TO (1 OR 2 OR 5 OR 6 OR 7) THEN
+            replacement = CALL FUNCTION characters_val("What do you want to replace the data with?")
+            RETURN selection, replacement
+        ELSE IF selection IS EQUAL TO 3 THEN
+            replacement = CALL FUNCTION numbers_val("What do you want to replace the data with?")
+            RETURN selection, replacement
+        ELSE IF selection IS EQUAL TO (4 OR 8) THEN
+            replacement = CALL FUNCTION noempty_val("What do you want to replace the data with?")
+            RETURN selection, replacement
+        ELSE IF selection IS EQUAL TO 9 THEN
+            replacement = CALL FUNCTION date_val("What do you want to replace the data with (DD/MM/YY)?")
+            RETURN selection, replacement
+        ENDIF
+    ELSE THEN
+        DISPLAY("No matching data found")
+        RETURN selection, replacement
+    ENDIF
+ENDFUNCTION
+
+FUNCTION modify_payment_data()
+    DECLARE file_name, column AS STRING
+    DECLARE record AS ARRAY
+    DECLARE option AS INTEGER
+
+    WHILE True
+        SET file_name AS "payment"
+        record = CALL FUNCTION findrecord(file_name)
+        column = nosymbols_val("Which Payment Data do you wish to Modify? (Enter Payment ID No.)")
+        FROM CALL FUNCTION showpmdata(record, column) RETURN VALUES TO selection, replacement
+        IF selection IS EQUAL TO None AND replacement IS EQUAL TO None THEN
+            PASS
+        ELSE THEN
+            CALL FUNCTION replacedata(column, record, selection, replacement, file_name)
+            option = CALL FUNCTION options_val("Do you want to continue modifying Payment Data(1), modify another type of data(2) or return to Main Menu(3)?", 3)
+            IF option IS EQUAL TO 1 THEN
+                CONTINUE
+            ELSE IF option IS EQUAL TO 2 THEN
+                SET i AS 4
+                RETURN 4
+            ELSE IF option IS EQUAL TO 3 THEN
+                SET i AS 1
+                RETURN i
+            ENDIF
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION showpmdata(record, column)
+    DECLARE flag AS BOOLEAN
+    DECLARE replacement AS STRING
+    DECLARE selection AS INTEGER
+
+    SET selection AS None
+    SET replacement AS None
+    SET flag AS False
+    FOR EACH data IN record
+        WHILE data[0] IS EQUAL TO column
+            DISPLAY("The current data available for the Payment No. you wish to modify is:")
+            DISPLAY("1. Payment ID No.   :", data[0])
+            DISPLAY("2. Tenant ID No.    :", data[1])
+            DISPLAY("3. Apartment No.    :", data[2])
+            DISPLAY("4. Amount Paid      :", data[3])
+            DISPLAY("5. Payment Month    :", data[4])
+            selection = CALL FUNCTION options_val("Which data do you wish to modify?", 5)
+            selection = selection - 1
+            flag = True
+        ENDWHILE
+    ENDFOR
+    IF flag IS EQUAL TO TRUE THEN
+        IF selection IS EQUAL TO 0 THEN
+            DISPLAY("Payment ID No. could not be changed, please try again")
+            PASS
+        ELSE IF selection IS EQUAL TO 1 THEN
+            replacement = CALL FUNCTION nosymbols_val("What do you want to replace the data with?")
+            RETURN selection, replacement
+        ELSE IF selection IS EQUAL TO 2 THEN
+            replacement = CALL FUNCTION noempty_val("What do you want to replace the data with?")
+            RETURN selection, replacement
+        ELSE IF selection IS EQUAL TO 3 THEN
+            replacement = CALL FUNCTION numbers_val("What do you want to replace the data with?")
+            RETURN selection, replacement
+        ELSE IF selection IS EQUAL TO 4 THEN
+            replacement = CALL FUNCTION month_val("What do you want to replace the data with (MM/YY)?")
+            RETURN selection, replacement
+        ENDIF
+    ELSE THEN
+        DISPLAY("No matching data found")
+        RETURN selection, replacement
+    ENDIF
+ENDFUNCTION
+
+FUNCTION remove_apartment_data()
+    DECLARE flag AS BOOLEAN
+    DECLARE file_name,apartment_no, confirmation AS STRING
+    DECLARE apartment_record AS ARRAY
+    DECLARE option AS INTEGER
+
+    WHILE True
+        SET flag AS False
+        SET file_name AS "apartment"
+        apartment_record = CALL FUNCTION findrecord(file_name)
+        apartment_no = CALL FUNCTION nosymbols_val("Which Apartment's Data do you wish to Delete? (Enter Apartment No.)")
+        FOR EACH apdata IN apartment_record
+            IF apdata[0] IS EQUAL TO tnid_no THEN
+                DISPLAY("The matching data for", apartment_no, " is found:")
+                DISPLAY("Apartment No.            :", apdata[0])
+                DISPLAY("Date of Acquisition.     :", apdata[1])
+                DISPLAY("Apartment Square Footage :", apdata[2])
+                DISPLAY("Rent Amount              :", apdata[3])
+                confirmation CALL FUNCTION characters_val("Do you wish to remove the displayed data? If yes, enter 'X'\n")
+                IF confirmation IN LOWER CASE IS EQUAL TO "x" THEN
+                    apdata IS REMOVE FROM apartment_record
+                    CALL FUNCTION deletedata(file_name, apartment_record, apdata[0])
+                    SET flag AS True
+                ENDIF
+            ENDIF
+        ENDFOR
+        IF flag IS EQUAL TO True THEN
+            option = CALL FUNCTION options_val("Do you want to delete other apartment Data(1), delete another type of data(2) or return to Main Menu(3)?", 3)
+            IF option IS EQUAL TO 1 THEN
+                CONTINUE
+            ELSE IF option IS EQUAL TO 2 THEN
+                SET i AS 5
+                RETURN i
+            ELSE IF option IS EQUAL TO 3 THEN
+                SET i AS 1
+                RETURN i
+            ENDIF
+        ELSE THEN
+            DISPLAY("No matching data found")
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION deletedata(file_name, record, name)
+    DECLARE datatype AS STRING
+    OPEN file_name IN WRITE MODE AS updateData
+        FOR EACH data IN record
+            FOR EACH item IN data
+                WRITE item WITH "," IN updateData
+            ENDFOR
+            WRITE "\n" IN updateData
+        ENDFOR
+    DISPLAY("Data Deleted")
+    CALL FUNCTION auditdeletedata(datatype, name)
+ENDFUNCTION
+
+FUNCTION auditdeletedata(datatype, name)
+    DECLARE dnt, data AS STRING
+
+    dnt = CALL FUNCTION currentdatetime()
+    SET data AS (dnt + datatype + " data of " + name + " has been deleted")
+    OPEN "audit" IN APPEND MODE AS record
+        WRITE data WITH "\n"
+ENDFUNCTION
+
+FUNCTION remove_tenant_data()
+    DECLARE flag AS BOOLEAN
+    DECLARE file_name,tnid_no, confirmation AS STRING
+    DECLARE tenant_record AS ARRAY
+    DECLARE option AS INTEGER
+
+    WHILE True
+        SET flag AS False
+        SET file_name AS "tenant"
+        tenant_record = CALL FUNCTION findrecord(file_name)
+        tnid_no = CALL FUNCTION nosymbols_val("Which Tenant's Data do you wish to Delete? (Enter Tenant ID No.)")
+        FOR EACH tndata IN tenant _record
+            IF tndata[0] IS EQUAL TO tnid_no THEN
+                DISPLAY("The matching data for", tnid_no, " is found:")
+                DISPLAY("1. Tenant ID No.        :", tndata[0])
+                DISPLAY("2. Full Tenant Name     :", tndata[1])
+                DISPLAY("3. Tenant Gender        :", tndata[2])
+                DISPLAY("4. Tenant Phone Number  :", tndata[3])
+                DISPLAY("5. Tenant Address       :", tndata[4])
+                DISPLAY("6. Tenant City          :", tndata[5])
+                DISPLAY("7. Tenant Job History   :", tndata[6])
+                DISPLAY("8. Tenant Current Job   :", tndata[7])
+                DISPLAY("9. Apartment No.        :", tndata[8])
+                DISPLAY("10. Date of Rent        :", tndata[9])
+                confirmation CALL FUNCTION characters_val("Do you wish to remove the displayed data? If yes, enter 'X'\n")
+                IF confirmation IN LOWER CASE IS EQUAL TO "x" THEN
+                    tndata IS REMOVE FROM tenant_record
+                    CALL FUNCTION deletedata(file_name, tenant_record, tndata[0])
+                    SET flag AS True
+                ENDIF
+            ENDIF
+        ENDFOR
+        IF flag IS EQUAL TO True THEN
+            option = CALL FUNCTION options_val("Do you want to delete other Tenant Data(1), delete another type of data(2) or return to Main Menu(3)?", 3)
+            IF option IS EQUAL TO 1 THEN
+                CONTINUE
+            ELSE IF option IS EQUAL TO 2 THEN
+                SET i AS 5
+                RETURN i
+            ELSE IF option IS EQUAL TO 3 THEN
+                SET i AS 1
+                RETURN i
+            ENDIF
+        ELSE THEN
+            DISPLAY("No matching data found")
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION remove_payment_data()
+    DECLARE flag AS BOOLEAN
+    DECLARE file_name,tnid_no, confirmation AS STRING
+    DECLARE payment_record AS ARRAY
+    DECLARE option AS INTEGER
+
+    WHILE True
+        SET flag AS False
+        SET file_name AS "payment"
+        payment_record = CALL FUNCTION findrecord(file_name)
+        pmid_no = CALL FUNCTION nosymbols_val("Which Tenant's Payment Data do you wish to Delete? (Enter Payment ID No.)")
+        FOR EACH pmdata IN payment_record
+            IF pmdata[0] IS EQUAL TO pmid_no THEN
+                DISPLAY("The matching data for", pmid_no, " is found:")
+                DISPLAY("1. Payment ID No.   :", pmdata[0])
+                DISPLAY("2. Tenant ID No.    :", pmdata[1])
+                DISPLAY("3. Apartment No.    :", pmdata[2])
+                DISPLAY("4. Amount Paid      :", pmdata[3])
+                DISPLAY("5. Payment Month    :", pmdata[4])
+                confirmation CALL FUNCTION characters_val("Do you wish to remove the displayed data? If yes, enter 'X'\n")
+                IF confirmation IN LOWER CASE IS EQUAL TO "x" THEN
+                    pmdata IS REMOVE FROM payment_record
+                    CALL FUNCTION deletedata(file_name, payment_record, pmdata[0])
+                    SET flag AS True
+                ENDIF
+            ENDIF
+        ENDFOR
+        IF flag IS EQUAL TO True THEN
+            option = CALL FUNCTION options_val("Do you want to delete other Payment Data(1), delete another type of data(2) or return to Main Menu(3)?", 3)
+            IF option IS EQUAL TO 1 THEN
+                CONTINUE
+            ELSE IF option IS EQUAL TO 2 THEN
+                SET i AS 5
+                RETURN i
+            ELSE IF option IS EQUAL TO 3 THEN
+                SET i AS 1
+                RETURN i
+            ENDIF
+        ELSE THEN
+            DISPLAY("No matching data found")
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION userpasswordreset(status)
+    DECLARE file_name, result, type, username, passwrd AS STRING
+    DECLARE userpw AS ARRAY
+
+    WHILE True:
+        DISPLAY("Change Username/Password")
+        SET file_name AS "userpw"
+        SET result AS None
+        SET type AS None
+        userpw = CALL FUNCTION findrecord(file_name)
+        username = CALL FUNCTION characters_val("Enter the username: ")
+        passwrd = CALL FUNCTION noempty_val("Enter the password: ")
+        FOR EACH data IN userpw
+            WHILE data[0] IS EQUAL TO username AND data[1] IS EQUAL TO password
+                result = CALL FUNCTION statuscheck(data, status)
+                IF result IS EQUAL TO "no" THEN
+                    BREAK
+                ELSE THEN
+                    option = CALL FUNCTION options_val("Do you want to change the Username(1) or Password(2)?", 2)
+                    IF option IS EQUAL TO 1 THEN
+                        SET type AS "Username"
+                    ELSE IF option IS EQUAL TO 2 THEN
+                        SET type AS "Password"
+                    ENDIF
+                    option = option - 1
+                    replacement = CALL FUNCTION changeuserpw(option)
+                    selection = CALL FUNCTION options_val("Do you want to save the new " + type + "(1) or change another new " + type + "(2) ?\n", 2)
+                    IF selection IS EQUAL TO 1 THEN
+                        SET data[option] AS replacement
+                        CALL FUNCTION replacedatatofile(file_name,userpw)
+                        DISPLAY ("The data have been changed!")
+                        CALL FUNCTION auditchguserpw(username, type)
+                        DISPLAY ("Redirecting you to Main Menu")
+                        SET result AS "back"
+                        BREAK
+                    ELSE IF selection IS EQUAL TO 2 THEN
+                        PASS
+                    ENDIF
+                ENDIF
+            ENDWHILE
+        ENDFOR
+        IF result IS EQUAL TO "no" THEN
+            CONTINUE
+        ELSE IF result IS EQUAL TO "back" THEN
+            SET i as 1
+            RETURN i
+        ELSE THEN
+            DISPLAY("No matching Username and Password found, please try again")
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION statuscheck(data, status)
+    DECLARE datastatus AS STRING
+    DECLARE power, power2 AS INTEGER
+
+    SET datastatus AS data[2]
+    power = CALL FUNCTION statustonumb(status)
+    power2 = CALL FUNCTION statustonumb(datastatus)
+    IF power IS BIGGER OR EQUAL TO power2 THEN
+        PASS
+    ELSE THEN
+        DISPLAY("You do not have the authority to change this Username or Password")
+        DISPLAY("Redirecting you to Change Username/Password page")
+        SET result AS "no"
+        RETURN result
+    ENDIF
+ENDFUNCTION
+
+FUNCTION statustonumb(status)
+    IF status IS EQUAL TO "superadmin" THEN
+        SET numb AS 3
+        RETURN numb
+    ELSE IF status IS EQUAL TO "admin" THEN
+        SET numb AS 2
+        RETURN numb
+    ELSE IF status IS EQUAL TO "tenant" THEN
+        SET numb AS 1
+        RETURN numb
+    ENDIF
+ENDFUNCTION
+
+FUNCTION changeuserpw(option)
+    DECLARE validation, replacement, confirmation as STRING
+
+    WHILE True:
+        SET validation AS None
+        IF option IS EQUAL TO 0 THEN
+            validation = CALL FUNCTION characters_val
+        ELSE IF option IS EQUAL TO 1 THEN
+            validation = CALL FUNCTION noempty_val
+        ENDIF
+        SET replacement AS validation("What do you want it to be changed to?")
+        SET confirmation AS validation("Please retype again for confirmation")
+        IF replacement IS EQUAL TO confirmation THEN
+            IF option IS EQUAL TO 0 THEN
+                DISPLAY("Your username will be changed to", replacement)
+                RETURN replacement
+            ELSE IF option IS EQUAL TO 1 THEN
+                CALL FUNCTION passwordstrength(replacement)
+                RETURN replacement
+            ENDIF
+        ELSE THEN
+            DISPLAY("Wrong input please try again")
+            PASS
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION passwordstrength(password)
+    DECLARE score AS INTEGER
+    DECLARE hint AS ARRAY
+
+    FROM CALL FUNCTION securityscore(password)RETURN VALUES TO score, hint
+    IF 0 SMALLER OR EQUAL TO score SMALLER OR EQUAL TO 2 THEN
+        DISPLAY("Your password's security is weak")
+    ELSE IF 2 SMALLER THAN score SMALLER OR EQUAL TO 4 THEN
+        DISPLAY("Your password's security is average")
+    ELSE IF 4 SMALLER THAN score SMALLER OR EQUAL TO 6 THEN
+        DISPLAY("Your password's security is strong")
+    ENDIF
+    IF score NOT EQUAL TO 6 THEN
+         DISPLAY("To increase your password's security, make another password with:", hint)
+    ENDIF
+ENDFUNCTION
+
+FUNCTION securityscore(password)
+    DECLARE score AS INTEGER
+    DECLARE hint AS ARRAY
+
+    IF password DOES NOT ONLY CONTAIN LOWER CASE THEN
+        score = score + 1
+    ELSE THEN
+        APPEND("uppercase character") INTO hint
+    ENDIF
+    IF password DOES NOT ONLY CONTAIN UPPER CASE THEN
+        score = score + 1
+    ELSE THEN
+        APPEND("lowercase character") INTO hint
+    ENDIF
+    IF password DOES NOT ONLY CONTAIN NUMBER THEN
+        score = score + 1
+    ELSE THEN
+        APPEND("characters other than numbers") INTO hint
+    ENDIF
+    IF password DOES NOT ONLY CONTAIN ALPHABETS THEN
+        score = score + 1
+    ELSE THEN
+        APPEND("characters other than alphabets") INTO hint
+    ENDIF
+    IF password DOES NOT ONLY CONTAIN ALPHABETS AND NUMBER THEN
+        score = score + 1
+    ELSE THEN
+        APPEND("special characters") INTO hint
+    ENDIF
+    IF LENGTH OF password BIGGER THAN 7 THEN
+        score = score + 1
+    ELSE THEN
+        APPEND("longer password") INTO hint
+    ENDIF
+    RETURN score, hint
+ENDFUNCTION
+
+FUNCTION replacedatatofile(file_name, newdata)
+    OPEN file_name IN WRITE MODE AS records
+        FOR EACH record IN newdata
+            FOR EACH item IN record
+                WRITE item WITH "," IN records
+            ENDFOR
+            WRITE "\n" IN records
+        ENDFOR
+    CLOSE file_name
+ENDFUNCTION
+
+FUNCTION auditchguserpw(username, type)
+    DECLARE dnt, data AS STRING
+
+    dnt = CALL FUNCTION currentdatetime()
+    SET data AS (dnt + username + "has change his/her" + type )
+    OPEN "audit" IN APPEND MODE AS record
+        WRITE data WITH "\n" IN record
+ENDFUNCTION
+
+FUNCTION auditlogout(username)
+    DECLARE dnt, data AS STRING
+
+    dnt = CALL FUNCTION currentdatetime()
+    SET data AS (dnt + username + "has log out")
+    OPEN "audit" IN APPEND MODE AS record
+        WRITE data WITH "\n" IN record
+ENDFUNCTION
+
+FUNCTION options_val(text, selection)
+    DECLARE data as STRING
+
+    WHILE True
+        IF data INPUT CORRECTLY THEN
+            DISPLAY text
+            GET data
+            IF LENGTH OF data BIGGER THAN 0 THEN
+                DECLARE selection, data AS INTEGER
+                IF (selection + 1) BIGGER THAN data BIGGER THAN 0 THEN
+                    RETURN data
+                ELSE THEN
+                    DISPLAY("Invalid Option! Please choose between [1]-[" + selection + "]")
+                ENDIF
+            ELSE THEN
+                DISPLAY("This column requires an input!")
+            ENDIF
+        ELSE THEN
+            DISPLAY("Only Numbers Allowed")
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION characters_val(text)
+    DECLARE i as INTEGER
+    DECLARE data AS STRING
+
+    WHILE True:
+        SET i AS 0
+        DISPLAY text
+        GET data
+        IF LENGTH OF data BIGGER THAN 0 THEN
+            FOR EACH number IN data
+                IF number IS ALPHABET or number IS SPACE THEN
+                    i = i + 1
+                ENDIF
+            ENDFOR
+            IF i IS EQUAL TO LENGTH OF data THEN
+                RETURN data
+            ELSE THEN
+                DISPLAY("No Numbers and Symbols Allowed! Please try again!")
+            ENDIF
+        ELSE THEN
+            DISPLAY("This column requires an input!")
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION numbers_val(text)
+    DECLARE i AS INTEGER
+    DECLARE data AS STRING
+
+    WHILE True:
+        SET i AS 0
+        DISPLAY text
+        GET data
+        IF LENGTH OF data BIGGER THAN 0 THEN
+            FOR EACH number IN data
+                IF number IS NUMERIC THEN
+                    i = i + 1
+                ENDIF
+            ENDFOR
+            IF i IS EQUAL TO LENGTH OF data THEN
+                RETURN data
+            ELSE THEN
+                DISPLAY("Only numbers are allowed! Please try again!")
+            ENDIF
+        ELSE THEN
+            DISPLAY("This column requires an input!")
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+
+FUNCTION nosymbol_val(text)
+    DECLARE symbols_list, data AS STRING
+    DECLARE flag AS BOOLEAN
+
+    SET symbols_list AS "~`!@#$%^&*()-_=\"+[]{}|\:;'?/<>,."
+    SET flag AS True
+    WHILE True
+        DISPLAY text
+        GET data
+        IF LENGTH OF data BIGGER THAN 0 THEN
+            FOR EACH i IN symbols_list
+                FOR EACH x IN data
+                    IF i IS EQUAL TO x THEN
+                        flag = False
+                    ENDIF
+                ENDFOR
+            ENDFOR
+        ELSE THEN
+            DISPLAY("This column requires an input!")
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION noempty_val(text)
+    DECLARE data AS STRING
+
+    WHILE True
+        DISPLAY text
+        GET data
+        IF LENGTH OF data BIGGER THAN 0 THEN
+            RETURN data
+        ELSE THEN
+            DISPLAY("This column requires an input!")
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+
+FUNCTION date_val(text)
+    DECLARE data AS STRING
+    DECLARE year, month, day AS INTEGER
+
+    WHILE True
+        DISPLAY text
+        GET data
+        IF LENGTH OF data BIGGER THAN 0 THEN
+            IF data INPUT CORRECTLY THEN
+                BREAK DOWN data INTO 3 VARIABLES AS day,month,year USING "/" AS DELIMITER
+                CHECK IF year, month, day ARE USING CORRECT FORMAT OF DATE THEN
+                RETURN data
+            ELSE THEN
+                DISPLAY("Invalid input! Please enter according to the format!")
+            ENDIF
+        ELSE THEN
+            DISPLAY("This column requires an input!")
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION month_val(text)
+    DECLARE data AS STRING
+    DECLARE year, month, day AS INTEGER
+
+    WHILE True
+        DISPLAY text
+        GET data
+        IF LENGTH OF data BIGGER THAN 0 THEN
+            IF data INPUT CORRECTLY THEN
+                BREAK DOWN data INTO 2 VARIABLES AS month,year USING "/" AS DELIMITER
+                SET day AS 1
+                CHECK IF year, month, day ARE USING CORRECT FORMAT OF DATE THEN
+                RETURN data
+            ELSE THEN
+                DISPLAY("Invalid input! Please enter according to the format!")
+            ENDIF
+        ELSE THEN
+            DISPLAY("This column requires an input!")
+        ENDIF
+    ENDWHILE
+ENDFUNCTION
+
+BEGIN
+CALL FUNCTION login()
+END
