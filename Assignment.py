@@ -854,15 +854,15 @@ def remove_payment_data():
         flag = False
         file_name = "payment"
         payment_record = findrecord(file_name)
-        tnid_no = nosymbols_val("Which Tenant's Payment Data do you wish to Delete? (Enter Tenant ID No.)\n")
+        pmid_no = nosymbols_val("Which Tenant's Payment Data do you wish to Delete? (Enter Payment ID No.)\n")
         for pmdata in payment_record:
-            if pmdata[0] == tnid_no:
-                print("The matching data for", tnid_no, " is found:\n")
+            if pmdata[0] == pmid_no:
+                print("The matching data for", pmid_no, " is found:\n")
                 print("1. Payment ID No.   :", pmdata[0])
                 print("2. Tenant ID No.    :", pmdata[1])
                 print("3. Apartment No.    :", pmdata[2])
                 print("4. Amount Paid      :", pmdata[3])
-                print("5. Payment Month   :", pmdata[4], "\n")
+                print("5. Payment Month    :", pmdata[4], "\n")
                 confirmation = characters_val("Do you wish to remove the displayed data? If yes, enter 'X'\n")
                 if confirmation.lower() == "x":
                     payment_record.remove(pmdata)
@@ -901,7 +901,7 @@ def userpasswordreset(status):
                     option = options_val("Do you want to change the Username(1) or Password(2)?\n", 2)
                     if option == 1:
                         type = "Username"
-                    if option == 2:
+                    elif option == 2:
                         type = "Password"
                     option -= 1
                     replacement = changeuserpw(option)
