@@ -979,10 +979,10 @@ FUNCTION remove_apartment_data()
             IF apdata[0] IS EQUAL TO tnid_no THEN
                 DISPLAY("The matching data for", apartment_no, " is found:")
                 DISPLAY("Apartment No.            :", apdata[0])
-                DISPLAY("Date of Acquisition.     :", apdata[1])
+                DISPLAY("Date of Acquisition      :", apdata[1])
                 DISPLAY("Apartment Square Footage :", apdata[2])
                 DISPLAY("Rent Amount              :", apdata[3])
-                confirmation CALL FUNCTION characters_val("Do you wish to remove the displayed data? If yes, enter 'X'\n")
+                confirmation = CALL FUNCTION characters_val("Do you wish to remove the displayed data? If yes, enter 'X'")
                 IF confirmation IN LOWER CASE IS EQUAL TO "x" THEN
                     apdata IS REMOVE FROM apartment_record
                     CALL FUNCTION deletedata(file_name, apartment_record, apdata[0])
@@ -1016,7 +1016,7 @@ FUNCTION deletedata(file_name, record, name)
             ENDFOR
             WRITE "\n" IN updateData
         ENDFOR
-    DISPLAY("Data Deleted")
+        DISPLAY("Data Deleted")
     CALL FUNCTION auditdeletedata(datatype, name)
 ENDFUNCTION
 
@@ -1053,7 +1053,7 @@ FUNCTION remove_tenant_data()
                 DISPLAY("8. Tenant Current Job   :", tndata[7])
                 DISPLAY("9. Apartment No.        :", tndata[8])
                 DISPLAY("10. Date of Rent        :", tndata[9])
-                confirmation CALL FUNCTION characters_val("Do you wish to remove the displayed data? If yes, enter 'X'\n")
+                confirmation = CALL FUNCTION characters_val("Do you wish to remove the displayed data? If yes, enter 'X'\n")
                 IF confirmation IN LOWER CASE IS EQUAL TO "x" THEN
                     tndata IS REMOVE FROM tenant_record
                     CALL FUNCTION deletedata(file_name, tenant_record, tndata[0])
@@ -1097,7 +1097,7 @@ FUNCTION remove_payment_data()
                 DISPLAY("3. Apartment No.    :", pmdata[2])
                 DISPLAY("4. Amount Paid      :", pmdata[3])
                 DISPLAY("5. Payment Month    :", pmdata[4])
-                confirmation CALL FUNCTION characters_val("Do you wish to remove the displayed data? If yes, enter 'X'\n")
+                confirmation = CALL FUNCTION characters_val("Do you wish to remove the displayed data? If yes, enter 'X'\n")
                 IF confirmation IN LOWER CASE IS EQUAL TO "x" THEN
                     pmdata IS REMOVE FROM payment_record
                     CALL FUNCTION deletedata(file_name, payment_record, pmdata[0])
