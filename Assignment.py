@@ -93,7 +93,7 @@ def smainmenu(username):  # main menu for super admin
 
 
 def smainmenuselect():
-    option = options_val("Please select an option\n1. View Audit Log\n2. Add New Admin\n3. Change Username or Password\n4. Log out\n", 5)
+    option = options_val("Please select an option\n1. View Audit Log\n2. Add New Admin\n3. Change Username or Password\n4. Log out\n", 4)
     i = option + 1
     return i
 
