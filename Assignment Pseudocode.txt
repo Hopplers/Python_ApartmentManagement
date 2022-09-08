@@ -108,7 +108,7 @@ ENDFUNCTION
 FUNCTION smainmenuselect()
 	DECLARE option AS STRING
 
-	option = CALL FUNCTION options_val("Please select an option 1. View Audit Log 2. Add New Admin 3. Change Username or Password 4. Log out", 5)
+	option = CALL FUNCTION options_val("Please select an option 1. View Audit Log 2. Add New Admin 3. Change Username or Password 4. Log out", 4)
 	SET i AS option + 1
 	RETURN i
 ENDFUNCTION
@@ -299,7 +299,7 @@ FUNCTION new_apartment_data()
 			details_apartment = [apartment_no, date_of_acquisition, apartment_square_footage, rent_amount]
 			APPEND details_apartment IN apartment_data
 			CALL FUNCTION savedata(file_name, apartment_data, apartment_no, "")
-			option = CALL FUNCTION option_val("Do you want to enter another apartment data(1), enter another type of new data(2) or return to Main Menu(3)?", 3)
+			option = CALL FUNCTION options_val("Do you want to enter another apartment data(1), enter another type of new data(2) or return to Main Menu(3)?", 3)
 			IF option IS EQUALS TO 1 THEN
 				CONTINUE
 			ELSE IF option IS EQUALS TO 2 THEN
@@ -770,7 +770,7 @@ FUNCTION showapdata(record, column)
             DISPLAY("2. Date of acquisition      : ", data[1])
             DISPLAY("3. Apartment Square Footage : ", data[2])
             DISPLAY("4. Rent Amount              : ", data[3]
-            selection = CALL FUNCTION options_val("Which data do you wish to modify?", 5)
+            selection = CALL FUNCTION options_val("Which data do you wish to modify?", 4)
             selection = selection - 1
             SET flag AS True
         ENDWHILE
