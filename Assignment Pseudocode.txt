@@ -13,7 +13,7 @@ FUNCTION login()
         FOR EACH data IN userpw
             IF data[0] IS EQUAL TO username THEN
                 IF data[1] ID EQUAL TO BLANKS THEN
-                    flag = True
+                    SET flag AS True
                     DISPLAY("Welcome new user")
                     WHILE flag IS EQUAL TO True
                         passwrd = noempty_val("As a startup, please insert a desirable password for your account")
@@ -772,7 +772,7 @@ FUNCTION showapdata(record, column)
             DISPLAY("4. Rent Amount              : ", data[3]
             selection = CALL FUNCTION options_val("Which data do you wish to modify?", 5)
             selection = selection - 1
-            flag = True
+            SET flag AS True
         ENDWHILE
     ENDFOR
     IF flag IS EQUAL TO TRUE THEN
@@ -866,7 +866,7 @@ FUNCTION showtndata(record, column)
             DISPLAY("10. Date of Rent         :", data[9])
             selection = CALL FUNCTION options_val("Which data do you wish to modify?", 10)
             selection = selection - 1
-            flag = True
+            SET flag AS True
         ENDWHILE
     ENDFOR
     IF flag IS EQUAL TO TRUE THEN
@@ -938,7 +938,7 @@ FUNCTION showpmdata(record, column)
             DISPLAY("5. Payment Month    :", data[4])
             selection = CALL FUNCTION options_val("Which data do you wish to modify?", 5)
             selection = selection - 1
-            flag = True
+            SET flag AS True
         ENDWHILE
     ENDFOR
     IF flag IS EQUAL TO TRUE THEN
