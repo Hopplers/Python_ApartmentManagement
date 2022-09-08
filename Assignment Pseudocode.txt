@@ -284,7 +284,7 @@ ENDFUNCTION
 
 FUNCTION new_apartment_data()
 	DECLARE file_name, apartment_no, date_of_acquisition AS STRING
-	DECLARE apartment_square_footage, rent_amount, option AS INTEGER
+	DECLARE apartment_square_footage, rent_amount, option, i AS INTEGER
 	DECLARE apartment_data, details_apartment AS ARRAY
 
 	WHILE TRUE
@@ -379,7 +379,7 @@ ENDFUNCTION
 
 FUNCTION new_tenant_data(status)
 	DECLARE file_name, newnumb, id_number, full_name, gender, address, city, job_history, current_job, apartment_no, date_of_rent AS STRING
-	DECLARE phone_number, option AS INTEGER
+	DECLARE phone_number, option, i AS INTEGER
 	DECALRE tenant_data, details_tenant AS ARRAY
 
 	WHILE TRUE
@@ -446,7 +446,7 @@ ENDFUNCTION
 
 FUNCTION new_payment_data()
 	DECLARE file_name, newnumb, payment_id, tenant_id, apartment_no, payment_month AS STRING
-	DECLARE amount_paid, option AS INTEGER
+	DECLARE amount_paid, option, i AS INTEGER
 	DECLARE payment_data, details_payment AS ARRAY
 
 	WHILE TRUE
@@ -540,7 +540,7 @@ FUNCTION view_apartment_data()
 	DECLARE file_name, datatype, apartment_noAS STRING
 	DECLARE flag AS BOOLEAN
 	DECLARE apartment_list AS ARRAY
-	DECLARE option AS INTEGER
+	DECLARE option, i AS INTEGER
 
 	WHILE TRUE
 		SET flag AS FALSE
@@ -602,7 +602,7 @@ FUNCTION view_tenant_data()
 	DECLARE file_name, datatype, tenant_id_number AS STRING
 	DECLARE tenant_list AS ARRAY
 	DECLARE flag AS BOOLEAN
-	DECLARE option AS INTEGER
+	DECLARE option, i AS INTEGER
 
 	WHILE TRUE
 		SET flag AS FALSE
@@ -730,7 +730,7 @@ ENDFUNCTION
 FUNCTION modify_apartment_data()
     DECLARE file_name, column AS STRING
     DECLARE record AS ARRAY
-    DECLARE option AS INTEGER
+    DECLARE option, i AS INTEGER
 
     WHILE True
         SET file_name AS "apartment"
@@ -809,7 +809,7 @@ ENDFUNCTION
 FUNCTION modify_tenant_data()
     DECLARE file_name, column AS STRING
     DECLARE record AS ARRAY
-    DECLARE option AS INTEGER
+    DECLARE option, i AS INTEGER
 
     WHILE True
         SET file_name AS "tenant"
@@ -836,7 +836,7 @@ ENDFUNCTION
 
 FUNCTION auditmodifydata(datatype, name)
     DECLARE dnt, data as STRING
-    
+
     dnt = CALL FUNCTION currentdatetime()
     SET data AS (dnt + datatype + " data of " + name + " has been modify")
     OPEN "audit" IN APPEND MODE AS record
@@ -895,7 +895,7 @@ ENDFUNCTION
 FUNCTION modify_payment_data()
     DECLARE file_name, column AS STRING
     DECLARE record AS ARRAY
-    DECLARE option AS INTEGER
+    DECLARE option, i AS INTEGER
 
     WHILE True
         SET file_name AS "payment"
@@ -968,7 +968,7 @@ FUNCTION remove_apartment_data()
     DECLARE flag AS BOOLEAN
     DECLARE file_name,apartment_no, confirmation AS STRING
     DECLARE apartment_record AS ARRAY
-    DECLARE option AS INTEGER
+    DECLARE option, i AS INTEGER
 
     WHILE True
         SET flag AS False
