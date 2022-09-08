@@ -16,7 +16,7 @@ FUNCTION login()
                     SET flag AS True
                     DISPLAY("Welcome new user")
                     WHILE flag IS EQUAL TO True
-                        passwrd = noempty_val("As a startup, please insert a desirable password for your account")
+                        passwrd = CALL FUNCTION noempty_val("As a startup, please insert a desirable password for your account")
                         CALL FUNCTION passwordstrength(passwrd)
                         option = CALL FUNCTION options_val("Do you want to save the password(1) or use another password(2)?", 2)
                         IF option IS EQUAL TO 1 THEN
@@ -296,7 +296,7 @@ FUNCTION new_apartment_data()
 			date_of_acquisition = CALL FUNCTION date_val("Enter Date of Acquisition(DD/MM/YY): ")
 			apartment_square_footage = CALL FUNCTION numbers_val("Enter Apartment Square Footage: ")
 			rent_amount = CALL FUNCTION numbers_val("Enter Rent Amount: ")
-			details_apartment = [apartment_no, date_of_acquisition, apartment_square_footage, rent_amount]
+			SET details_apartment AS [apartment_no, date_of_acquisition, apartment_square_footage, rent_amount]
 			APPEND details_apartment IN apartment_data
 			CALL FUNCTION savedata(file_name, apartment_data, apartment_no, "")
 			option = CALL FUNCTION options_val("Do you want to enter another apartment data(1), enter another type of new data(2) or return to Main Menu(3)?", 3)
@@ -530,7 +530,7 @@ FUNCTION paymentstatus(payment_month, tenant_id, apartment_no, amount_paid)
 		ELSE THEN
 			SET paymentstatus AS "unpaid"
 		ENDIF
-		SET details = (payment_month, tenant_id, apartment_no, rentalfee, amount_paid, paymentstatus)
+		SET details AS (payment_month, tenant_id, apartment_no, rentalfee, amount_paid, paymentstatus)
 		APPEND details IN data
 		CALL FUNCTION savedata(file_name,data, tenant_id,"")
 	ENDIF
@@ -735,7 +735,7 @@ FUNCTION modify_apartment_data()
     WHILE True
         SET file_name AS "apartment"
         record = CALL FUNCTION findrecord(file_name)
-        column = noempty_val("Which Apartment Data do you wish to Modify? (Enter Apartment No.)")
+        column = CALL FUNCTION noempty_val("Which Apartment Data do you wish to Modify? (Enter Apartment No.)")
         CALL FUNCTION showapdata(record, column) RETURN VALUES TO selection, replacement
         IF selection IS EQUAL TO None AND replacement IS EQUAL TO None THEN
             PASS
@@ -769,7 +769,7 @@ FUNCTION showapdata(record, column)
             DISPLAY("1. Apartment No.            : ", data[0])
             DISPLAY("2. Date of acquisition      : ", data[1])
             DISPLAY("3. Apartment Square Footage : ", data[2])
-            DISPLAY("4. Rent Amount              : ", data[3]
+            DISPLAY("4. Rent Amount              : ", data[3])
             selection = CALL FUNCTION options_val("Which data do you wish to modify?", 4)
             selection = selection - 1
             SET flag AS True
@@ -814,7 +814,7 @@ FUNCTION modify_tenant_data()
     WHILE True
         SET file_name AS "tenant"
         record = CALL FUNCTION findrecord(file_name)
-        column = nosymbols_val("Which Tenant's Data do you wish to Modify? (Enter Tenant ID No.)")
+        column = CALL FUNCTION nosymbols_val("Which Tenant's Data do you wish to Modify? (Enter Tenant ID No.)")
         CALL FUNCTION showtndata(record, column) RETURN VALUES TO selection, replacement
         IF selection IS EQUAL TO None AND replacement IS EQUAL TO None THEN
             PASS
@@ -873,7 +873,7 @@ FUNCTION showtndata(record, column)
         IF selection IS EQUAL TO 0 THEN
             DISPLAY("Tenant ID No. could not be changed, please try again")
             PASS
-        ELSE IF selection IS EQUAL TO (1 OR 2 OR 5 OR 6 OR 7) THEN
+            ELSE IF selection IS EQUAL TO (1 OR 2 OR 5 OR 6 OR 7) THEN
             replacement = CALL FUNCTION characters_val("What do you want to replace the data with?")
             RETURN selection, replacement
         ELSE IF selection IS EQUAL TO 3 THEN
@@ -900,7 +900,7 @@ FUNCTION modify_payment_data()
     WHILE True
         SET file_name AS "payment"
         record = CALL FUNCTION findrecord(file_name)
-        column = nosymbols_val("Which Payment Data do you wish to Modify? (Enter Payment ID No.)")
+        column = CALL FUNCTION nosymbols_val("Which Payment Data do you wish to Modify? (Enter Payment ID No.)")
         CALL FUNCTION showpmdata(record, column) RETURN VALUES TO selection, replacement
         IF selection IS EQUAL TO None AND replacement IS EQUAL TO None THEN
             PASS
@@ -1400,7 +1400,7 @@ FUNCTION nosymbol_val(text)
             FOR EACH i IN symbols_list
                 FOR EACH x IN data
                     IF i IS EQUAL TO x THEN
-                        flag = False
+                        SET flag AS False
                     ENDIF
                 ENDFOR
             ENDFOR
