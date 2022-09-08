@@ -63,7 +63,7 @@ FUNCTION auditsetup(username)
 	dnt = CALL FUNCTION currentdatetime()
 	SET data AS (dnt + username + " has set up his/her account ")
 	OPEN "audit" IN APPEND MODE AS record THEN
-		WRITE data WITH "\n" IN record
+	WRITE data WITH "\n" IN record
 ENDFUNCTION
 
 FUNCTION auditlogin(username)
@@ -72,7 +72,7 @@ FUNCTION auditlogin(username)
 	dnt = CALL FUNCTION currentdatetime()
 	SET data AS (dnt + username + " has log in ")
 	OPEN "audit" IN APPEND MODE AS record THEN
-		WRITE data WITH "\n" IN record
+	WRITE data WITH "\n" IN record
 ENDFUNCTION
 
 FUNCTION currentdatetime()
@@ -332,22 +332,22 @@ FUNCTION savedata(file_name, data, name, status)
 
 	SET datatype AS file_name
 	OPEN file_name IN APPEND MODE AS records
-		FOR record IN data
-			FOR item in record
-				WRITE item WITH "," IN records
-			ENDFOR
-			WRITE "\n" IN records
-		ENDFOR
-		IF datatype IS NOT EQUALS TO "userpw" AND datatype IS NOT EQUALS TO "paymentstatus" THEN
-			CALL FUNCTION auditnewdata(datatype, name)
-			DISPLAY ("Data Saved.")
-		ELSE IF datatype IS EQUALS TO "userpw" THEN
-			CALL FUNCTION auditnewuser(status, name)
-			DISPLAY ("New username, " + name + " is created")
-		ELSE IF datatype IS EQUALS TO "paymentstatus" THEN
-			CALL FUNCTION auditpaystatus(name)
-			DISPLAY ("Payment Status updated")
-		ENDIF
+    FOR record IN data
+        FOR item in record
+            WRITE item WITH "," IN records
+        ENDFOR
+        WRITE "\n" IN records
+    ENDFOR
+    IF datatype IS NOT EQUALS TO "userpw" AND datatype IS NOT EQUALS TO "paymentstatus" THEN
+        CALL FUNCTION auditnewdata(datatype, name)
+        DISPLAY ("Data Saved.")
+    ELSE IF datatype IS EQUALS TO "userpw" THEN
+        CALL FUNCTION auditnewuser(status, name)
+        DISPLAY ("New username, " + name + " is created")
+    ELSE IF datatype IS EQUALS TO "paymentstatus" THEN
+        CALL FUNCTION auditpaystatus(name)
+        DISPLAY ("Payment Status updated")
+    ENDIF
 ENDFUNCTION
 
 FUNCTION auditnewdata(datatype, name)
@@ -356,7 +356,7 @@ FUNCTION auditnewdata(datatype, name)
 	dnt = CALL FUNCTION currentdatetime()
 	SET data AS (dnt + "new " + datatype + " data for " + name + " has been added")
 	OPEN "audit" IN APPEND MODE AS record
-		WRITE data WITH "\n" IN record
+	WRITE data WITH "\n" IN record
 ENDFUNCTION
 
 FUNCTION auditnewuser(status,name)
@@ -365,7 +365,7 @@ FUNCTION auditnewuser(status,name)
 	dnt = CALL FUNCTION currentdatetime()
 	SET data AS (dnt +"new user " + name + " has been added as " + status)
 	OPEN "audit" IN APPEND MODE AS record
-		WRITE data WITH "\n" IN record
+	WRITE data WITH "\n" IN record
 ENDFUNCTION
 
 FUNCTION auditpaystatus(name)
@@ -374,7 +374,7 @@ FUNCTION auditpaystatus(name)
 	dnt = CALL FUNCTION currentdatetime()
 	SET data AS (dnt + "payment status for " + name + " has been updated")
 	OPEN "audit" IN APPEND MODE AS record
-		WRITE data WITH "\n" IN record
+	WRITE data WITH "\n" IN record
 ENDFUNCTION
 
 FUNCTION new_tenant_data(status)
@@ -430,7 +430,7 @@ FUNCTION newnumbgen(file_name)
 	lines = CALL FUNCTION fileline(file_name)
 	SET newnumb AS (lines + 1)
 	OPEN file_name IN APPEND MODE AS records
-		WRITE newnumb WITH "\n" INTO records
+	WRITE newnumb WITH "\n" INTO records
 	RETURN newnumb
 ENDFUNCTION
 
@@ -439,9 +439,9 @@ FUNCTION fileline(file_name)
 
 	SET lines AS 0
 	OPEN file_name IN READ MODE AS records
-		FOR line IN records
-			lines = lines + 1
-		RETURN lines
+    FOR line IN records
+        lines = lines + 1
+    RETURN lines
 ENDFUNCTION
 
 FUNCTION new_payment_data()
@@ -580,13 +580,13 @@ FUNCTION findrecord(file_name)
 	DECLARE record, item AS ARRAY
 
 	OPEN file_name IN READ MODE AS records
-		FOR line IN records
-			REMOVE LEADING AND TRAILING BLANKS FROM line
-			REMOVE LEADING AND TRAILING "," FROM line
-			CONVERT line INTO ARRAY AS item USING "," AS A DELIMITER
-			APPEND item IN record
-		ENDFOR
-		RETURN record
+    FOR line IN records
+        REMOVE LEADING AND TRAILING BLANKS FROM line
+        REMOVE LEADING AND TRAILING "," FROM line
+        CONVERT line INTO ARRAY AS item USING "," AS A DELIMITER
+        APPEND item IN record
+    ENDFOR
+    RETURN record
 ENDFUNCTION
 
 FUNCTION auditsearchdata(datatype, name)
@@ -595,7 +595,7 @@ FUNCTION auditsearchdata(datatype, name)
 	dnt = CALL FUNCTION currentdatetime()
 	SET data AS (dnt + datatype + " data of " + name + " has been searched")
 	OPEN "audit" IN APPEND MODE AS record
-		WRITE data WITH "/n" IN record
+    WRITE data WITH "/n" IN record
 ENDFUNCTION
 
 FUNCTION view_tenant_data()
@@ -840,7 +840,7 @@ FUNCTION auditmodifydata(datatype, name)
     dnt = CALL FUNCTION currentdatetime()
     SET data AS (dnt + datatype + " data of " + name + " has been modify")
     OPEN "audit" IN APPEND MODE AS record
-        WRITE data WITH "\n" IN record
+    WRITE data WITH "\n" IN record
 ENDFUNCTION
 
 FUNCTION showtndata(record, column)
@@ -1010,13 +1010,13 @@ ENDFUNCTION
 FUNCTION deletedata(file_name, record, name)
     DECLARE datatype AS STRING
     OPEN file_name IN WRITE MODE AS updateData
-        FOR EACH data IN record
-            FOR EACH item IN data
-                WRITE item WITH "," IN updateData
-            ENDFOR
-            WRITE "\n" IN updateData
+    FOR EACH data IN record
+        FOR EACH item IN data
+            WRITE item WITH "," IN updateData
         ENDFOR
-        DISPLAY("Data Deleted")
+        WRITE "\n" IN updateData
+    ENDFOR
+    DISPLAY("Data Deleted")
     CALL FUNCTION auditdeletedata(datatype, name)
 ENDFUNCTION
 
@@ -1026,7 +1026,7 @@ FUNCTION auditdeletedata(datatype, name)
     dnt = CALL FUNCTION currentdatetime()
     SET data AS (dnt + datatype + " data of " + name + " has been deleted")
     OPEN "audit" IN APPEND MODE AS record
-        WRITE data WITH "\n"
+    WRITE data WITH "\n"
 ENDFUNCTION
 
 FUNCTION remove_tenant_data()
@@ -1286,12 +1286,12 @@ ENDFUNCTION
 
 FUNCTION replacedatatofile(file_name, newdata)
     OPEN file_name IN WRITE MODE AS records
-        FOR EACH record IN newdata
-            FOR EACH item IN record
-                WRITE item WITH "," IN records
-            ENDFOR
-            WRITE "\n" IN records
+    FOR EACH record IN newdata
+        FOR EACH item IN record
+            WRITE item WITH "," IN records
         ENDFOR
+        WRITE "\n" IN records
+    ENDFOR
     CLOSE file_name
 ENDFUNCTION
 
@@ -1301,7 +1301,7 @@ FUNCTION auditchguserpw(username, type)
     dnt = CALL FUNCTION currentdatetime()
     SET data AS (dnt + username + "has change his/her" + type )
     OPEN "audit" IN APPEND MODE AS record
-        WRITE data WITH "\n" IN record
+    WRITE data WITH "\n" IN record
 ENDFUNCTION
 
 FUNCTION auditlogout(username)
@@ -1310,7 +1310,7 @@ FUNCTION auditlogout(username)
     dnt = CALL FUNCTION currentdatetime()
     SET data AS (dnt + username + "has log out")
     OPEN "audit" IN APPEND MODE AS record
-        WRITE data WITH "\n" IN record
+    WRITE data WITH "\n" IN record
 ENDFUNCTION
 
 FUNCTION options_val(text, selection)
