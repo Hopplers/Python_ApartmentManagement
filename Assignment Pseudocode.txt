@@ -736,7 +736,7 @@ FUNCTION modify_apartment_data()
         SET file_name AS "apartment"
         record = CALL FUNCTION findrecord(file_name)
         column = noempty_val("Which Apartment Data do you wish to Modify? (Enter Apartment No.)")
-        FROM CALL FUNCTION showapdata(record, column) RETURN VALUES TO selection, replacement
+        CALL FUNCTION showapdata(record, column) RETURN VALUES TO selection, replacement
         IF selection IS EQUAL TO None AND replacement IS EQUAL TO None THEN
             PASS
         ELSE THEN
@@ -815,7 +815,7 @@ FUNCTION modify_tenant_data()
         SET file_name AS "tenant"
         record = CALL FUNCTION findrecord(file_name)
         column = nosymbols_val("Which Tenant's Data do you wish to Modify? (Enter Tenant ID No.)")
-        FROM CALL FUNCTION showtndata(record, column) RETURN VALUES TO selection, replacement
+        CALL FUNCTION showtndata(record, column) RETURN VALUES TO selection, replacement
         IF selection IS EQUAL TO None AND replacement IS EQUAL TO None THEN
             PASS
         ELSE THEN
@@ -901,7 +901,7 @@ FUNCTION modify_payment_data()
         SET file_name AS "payment"
         record = CALL FUNCTION findrecord(file_name)
         column = nosymbols_val("Which Payment Data do you wish to Modify? (Enter Payment ID No.)")
-        FROM CALL FUNCTION showpmdata(record, column) RETURN VALUES TO selection, replacement
+        CALL FUNCTION showpmdata(record, column) RETURN VALUES TO selection, replacement
         IF selection IS EQUAL TO None AND replacement IS EQUAL TO None THEN
             PASS
         ELSE THEN
@@ -1234,7 +1234,7 @@ FUNCTION passwordstrength(password)
     DECLARE score AS INTEGER
     DECLARE hint AS ARRAY
 
-    FROM CALL FUNCTION securityscore(password)RETURN VALUES TO score, hint
+    CALL FUNCTION securityscore(password)RETURN VALUES TO score, hint
     IF 0 SMALLER OR EQUAL TO score SMALLER OR EQUAL TO 2 THEN
         DISPLAY("Your password's security is weak")
     ELSE IF 2 SMALLER THAN score SMALLER OR EQUAL TO 4 THEN
