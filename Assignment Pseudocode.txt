@@ -1164,14 +1164,11 @@ ENDFUNCTION
 
 FUNCTION statustonumb(status)
     IF status IS EQUAL TO "superadmin" THEN
-        SET numb AS 3
-        RETURN numb
+        RETURN 3
     ELSE IF status IS EQUAL TO "admin" THEN
-        SET numb AS 2
-        RETURN numb
+        RETURN 2
     ELSE IF status IS EQUAL TO "tenant" THEN
-        SET numb AS 1
-        RETURN numb
+        RETURN 1
     ENDIF
 ENDFUNCTION
 
@@ -1233,7 +1230,7 @@ FUNCTION securityscore(password)
     ELSE THEN
         APPEND("lowercase character") INTO hint
     ENDIF
-    IF password DOES NOT ONLY CONTAIN NUMBER THEN
+    IF password DOES NOT ONLY CONTAIN NUMBERS THEN
         score = score + 1
     ELSE THEN
         APPEND("characters other than numbers") INTO hint
@@ -1243,7 +1240,7 @@ FUNCTION securityscore(password)
     ELSE THEN
         APPEND("characters other than alphabets") INTO hint
     ENDIF
-    IF password DOES NOT ONLY CONTAIN ALPHABETS AND NUMBER THEN
+    IF password DOES NOT ONLY CONTAIN ALPHABETS AND NUMBERS THEN
         score = score + 1
     ELSE THEN
         APPEND("special characters") INTO hint
@@ -1264,7 +1261,6 @@ FUNCTION replacedatatofile(file_name, newdata)
         ENDFOR
         WRITE "\n" IN records
     ENDFOR
-    CLOSE file_name
 ENDFUNCTION
 
 FUNCTION auditchguserpw(username, type)
