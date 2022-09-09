@@ -1,15 +1,15 @@
-def login():
+def login():  #function for log-in page
     while True:
         flag = False
         file_name = "userpw"
         print("Log-in Page")
         time.sleep(0.5)
         username = characters_val("Username: ")
-        userpw = findrecord(file_name)
+        userpw = findrecord(file_name)  #find username and password from file
         for data in userpw:
             if data[0] == username:
                 if data[1] == "":
-                    flag = True
+                    flag = True  #username is valid
                     print("Welcome new user")
                     time.sleep(0.5)
                     while flag:
@@ -18,56 +18,56 @@ def login():
                         option = options_val("Do you want to save the password(1) or use another password(2)?\n", 2)
                         if option == 1:
                             data[1] = passwrd
-                            replacedatatofile(file_name, userpw)
+                            replacedatatofile(file_name, userpw)  #save password for newuser
                             print("Password saved!")
                             auditsetup(username)
                             time.sleep(0.5)
                             print("Redirecting you to Log In page")
                             time.sleep(0.5)
-                            break
+                            break  #back to while True
                         elif option == 2:
-                            pass
+                            pass  #back to while flag
                 else:
                     password = noempty_val("Password: ")
-                    flag = True
+                    flag = True  #username is valid
                     if data[1] == password:
                         auditlogin(username)
                         if data[2] == "superadmin":
                             smainmenu(username)
-                            break
+                            break  #back to while True
                         elif data[2] == "admin":
                             amainmenu(username)
-                            break
+                            break  #back to while True
                         elif data[2] == "tenant":
                             tmainmenu(username)
-                            break
+                            break  #back to while True
                     else:
                         print("Incorrect password, please try again")
                         time.sleep(0.5)
-                    break
+                    break  #back to while True
         if not flag:
             print("Incorrect username, please try again")
             time.sleep(0.5)
-            continue
+            continue  #back to while True
 
-def auditsetup(username):
-    dnt = currentdatetime()
+def auditsetup(username):  #function to update audit log when done setting up account
+    dnt = currentdatetime()  #date and time import from function
     data = (dnt + username + " has set up his/her account ")
     with open("audit", "a") as record:
         record.write(data + "\n")
 
-def auditlogin(username):
-    dnt = currentdatetime()
+def auditlogin(username):  #function to update audit log when someone login
+    dnt = currentdatetime()  #date and time import from function
     data = (dnt + username + " has log in ")
     with open("audit", "a") as record:
         record.write(data + "\n")
 
-def currentdatetime():
+def currentdatetime():  #function to get current date and time
     now = datetime.now()
     dnt = now.strftime("[%d/%m/%Y %H:%M:%S] ")
-    return dnt
+    return dnt  #return current date and time
 
-def smainmenu(username):  # main menu for super admin
+def smainmenu(username):  #function of main menu for super admin
     status = "superadmin"
     print(username, ", Welcome to D&J Tenant Management System\n")
     time.sleep(0.5)
@@ -89,15 +89,15 @@ def smainmenu(username):  # main menu for super admin
             print("Goodbye!")
             auditlogout(username)
             time.sleep(0.5)
-            break
+            break  #back to login page
 
 
-def smainmenuselect():
+def smainmenuselect():  #function for mainmenu selection for super admin
     option = options_val("Please select an option\n1. View Audit Log\n2. Add New Admin\n3. Change Username or Password\n4. Log out\n", 4)
     i = option + 1
     return i
 
-def view_audit_log():
+def view_audit_log():  #function for viewing audit log
     file_name = "audit"
     record = findrecord(file_name)
     print("These are the recent 20 records in audit log:\n")
@@ -107,7 +107,7 @@ def view_audit_log():
     print("Redirecting you to Main Menu")
     return 1
 
-def new_user(status,username):
+def new_user(status,username):  #function to add newuser
     while True:
         position = None
         file_name = "userpw"
@@ -118,18 +118,18 @@ def new_user(status,username):
             position = "tenant"
         records = findrecord(file_name)
         for lines in records:
-            if lines[0] == username:
+            if lines[0] == username:  #when the smae username is found
                 print("This username has been taken, please enter another username")
                 time.sleep(0.5)
-                break
+                break  #back to while True
         else:
             data = []
             details = [username, "", position]
             data.append(details)
             savedata(file_name, data, username, position)
-            return 1
+            return 1  #to return to super admin main menu if from main menu
 
-def amainmenu(username):  # main menu for admin
+def amainmenu(username):  #function of main menu for admin
     status = "admin"
     print(username, ", Welcome to D&J Tenant Management System\n")
     time.sleep(0.5)
@@ -191,14 +191,14 @@ def amainmenu(username):  # main menu for admin
             print("Goodbye!")
             auditlogout(username)
             time.sleep(0.5)
-            break
+            break  #back to login page
 
-def amainmenuselect():  #admin main menu select
+def amainmenuselect():  #function for mainmenu selection for admin
     option = options_val("Please select an option\n1. Enter New Data\n2. Search Current Available Data\n3. Modify Current Available Data\n4. Delete Current Available Data\n5. Change Username or Password\n6. Log Out \n", 6)
     i = option + 1
     return i
 
-def tmainmenu(username):
+def tmainmenu(username):  #function of main menu for tenant
     status = "tenant"
     print(username, ", Welcome to D&J Tenant Management System\n")
     i = 1
@@ -228,7 +228,7 @@ def tmainmenu(username):
             time.sleep(0.5)
             break
 
-def tmainmenuselect():
+def tmainmenuselect():  #function for mainmenu selection for tenant
     option = options_val("Please select an option\n1. Search Current Available Data\n2. Change Username or Password\n3. Log Out \n", 3)
     i = option + 1
     return i
@@ -256,15 +256,14 @@ def new_apartment_data():  #function for entering new apartment data
             elif option == 3:
                 return 1
 
-def isAvailable(file_name, position, text):
-    data = text
+def isAvailable(file_name, position, data):  #function to check if the data is available in file
     records = findrecord(file_name)
     for lines in records:
         if lines[position] == data:
             return True
     return False
 
-def savedata(file_name, data, name, status):
+def savedata(file_name, data, name, status):  #function to save data into files
     datatype = file_name
     with open(file_name, "a") as records:
         for record in data:
@@ -285,19 +284,19 @@ def savedata(file_name, data, name, status):
             time.sleep(0.5)
 
 
-def auditnewdata(datatype, name):
+def auditnewdata(datatype, name):  #function to update audit log when new data is added
     dnt = currentdatetime()
     data = (dnt + "new " + datatype + " data for " + name + " has been added")
     with open("audit", "a") as record:
         record.write(data + "\n")
 
-def auditnewuser(status, name):
+def auditnewuser(status, name):  #function to update audit log when new user is added
     dnt = currentdatetime()
     data = (dnt +"new user " + name + " has been added as " + status)
     with open("audit", "a") as record:
         record.write(data + "\n")
 
-def auditpaystatus(name):
+def auditpaystatus(name):  #function to update audit log when payment status is updated
     dnt = currentdatetime()
     data = (dnt + "payment status for " + name + " has been updated")
     with open("audit", "a") as record:
@@ -326,11 +325,12 @@ def new_tenant_data(status):  #function for entering new tenant data
                 if not isAvailable("apartment", 0, apartment_no):
                     print("This Apartment no. does not exist, please re-enter the Apartment no.")
                     time.sleep(0.5)
-                    continue
+                    continue  #back to while True
                 else:
                     date_of_rent = date_val("Enter Date of Rent(DD/MM/YY): ")
                     details_tenant = [id_number, full_name, gender, phone_number, address, city, job_history, current_job, apartment_no, date_of_rent]
                     tenant_data.append(details_tenant)
+                    print("This Tenant's ID No. is", id_number)
                     savedata(file_name, tenant_data, id_number, "")
                     new_user(status, full_name)
                     option = options_val("Do you want to enter another tenant data(1), enter another type of new data(2) or return to Main Menu(3)?\n", 3)
@@ -341,14 +341,14 @@ def new_tenant_data(status):  #function for entering new tenant data
                     elif option == 3:
                         return 1
 
-def newnumbgen(file_name):
+def newnumbgen(file_name):  #function to make new number for tenant id and payment id
     lines = fileline(file_name)
     newnumb = str(lines + 1)
     with open(file_name, "a") as records:
         records.write(newnumb + "\n")
     return newnumb
 
-def fileline(file_name):
+def fileline(file_name):  #function to count lines of file
     lines = 0
     with open(file_name, "r") as records:
         for line in records:
@@ -388,7 +388,7 @@ def new_payment_data():  #function for entering new payment data
                     elif option == 3:
                         return 1
 
-def paymentstatus(payment_month, tenant_id, apartment_no, amount_paid):
+def paymentstatus(payment_month, tenant_id, apartment_no, amount_paid):  #function to create or update payment status
     flag = False
     data = []
     rentalfee = None
@@ -424,7 +424,7 @@ def paymentstatus(payment_month, tenant_id, apartment_no, amount_paid):
         data.append(details)
         savedata(file_name,data, tenant_id,"")
 
-def view_apartment_data():
+def view_apartment_data():  #function to view apartment data
     while True:
         flag = False
         file_name = "apartment"
@@ -452,7 +452,7 @@ def view_apartment_data():
             print("No matching data found")
             time.sleep(0.5)
 
-def findrecord(file_name):
+def findrecord(file_name):  #function to convert file data into array
     record = []
     with open(file_name, "r") as records:
         for line in records:
@@ -460,13 +460,13 @@ def findrecord(file_name):
             record.append(item)
         return record
 
-def auditsearchdata(datatype, name):
+def auditsearchdata(datatype, name):  #function to update audit log when data is searched
     dnt = currentdatetime()
     data = (dnt + datatype + " data of " + name + " has been searched")
     with open("audit", "a") as record:
         record.write(data + "\n")
 
-def view_tenant_data():
+def view_tenant_data():  #function to view tenant data
     while True:
         flag = False
         file_name = "tenant"
@@ -500,7 +500,7 @@ def view_tenant_data():
             print("No matching data found")
             time.sleep(0.5)
 
-def view_payment_data():
+def view_payment_data():  #function to view payment data
     while True:
         flag = False
         file_name = "payment"
@@ -528,7 +528,7 @@ def view_payment_data():
             print("No matching data found")
             time.sleep(0.5)
 
-def viewpaymentstatus():
+def viewpaymentstatus():  #function to view payment status
     while True:
         flag = False
         file_name = "paymentstatus"
@@ -916,14 +916,11 @@ def statuscheck(data, status):
 
 def statustonumb(status):
     if status == "superadmin":
-        numb = 3
-        return numb
+        return 3
     elif status == "admin":
-        numb = 2
-        return numb
+        return 2
     elif status == "tenant":
-        numb = 1
-        return numb
+        return 1
 
 def changeuserpw(option):
     while True:
@@ -1034,8 +1031,10 @@ def characters_val(text):
                 return data
             else:
                 print("No Numbers and Symbols Allowed! Please try again!")
+                time.sleep(0.5)
         else:
             print("This column requires an input!")
+            time.sleep(0.5)
 
 def numbers_val(text):
     while True:
@@ -1049,8 +1048,10 @@ def numbers_val(text):
                 return data
             else:
                 print("Only numbers are allowed! Please try again!")
+                time.sleep(0.5)
         else:
             print("This column requires an input!")
+            time.sleep(0.5)
 
 def nosymbols_val(text):
     symbols_list = "~`!@#$%^&*()-_=\"+[]{}|\:;'?/<>,."
@@ -1065,10 +1066,12 @@ def nosymbols_val(text):
                         continue
             if flag == False:
                 print("No symbols allowed")
+                time.sleep(0.5)
             else:
                 return data
         else:
             print("This column requires an input!")
+            time.sleep(0.5)
 
 def noempty_val(text):
     while True:
@@ -1077,6 +1080,7 @@ def noempty_val(text):
             return data
         else:
             print("This column requires an input!")
+            time.sleep(0.5)
 
 def date_val(text):
     while True:
@@ -1089,8 +1093,10 @@ def date_val(text):
 
             except ValueError:
                 print("Invalid input! Please enter according to the format!")
+                time.sleep(0.5)
         else:
             print("This column requires an input!")
+            time.sleep(0.5)
 
 def month_val(text):
     while True:
@@ -1104,8 +1110,10 @@ def month_val(text):
 
             except ValueError:
                 print("Invalid input! Please enter according to the format!")
+                time.sleep(0.5)
         else:
             print("This column requires an input!")
+            time.sleep(0.5)
 
 from datetime import datetime
 import time
