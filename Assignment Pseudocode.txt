@@ -1378,6 +1378,7 @@ FUNCTION nosymbols_val(text)
                 DISPLAY("No symbols allowed")
             ELSE
                 RETURN data
+            ENDIF
         ELSE THEN
             DISPLAY("This column requires an input!")
         ENDIF
