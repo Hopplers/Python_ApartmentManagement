@@ -403,6 +403,7 @@ FUNCTION new_tenant_data(status)
 					date_of_rent = CALL FUNCTION date_val("Enter Date of Rent(DD/MM/YY): ")
 					SET details_tenant AS [id_number, full_name, gender, phone_number, address, city, job_history, current_job, apartment_no, date_of_rent]
 					APPEND details_tenant IN tenant_data
+					DISPLAY("This Tenant's ID No. is", id_number)
 					CALL FUNCTION savedata(file_name, tenant_data, id_number, "")
 					CALL FUNCTION new_user(status, full_name)
 					option = CALL FUNCTION options_val("Do you want to enter another tenant data(1), enter another type of new data(2) or return to Main Menu(3)?", 3)
@@ -1376,7 +1377,7 @@ FUNCTION nosymbols_val(text)
             ENDFOR
             IF flag IS EQUAL TO FALSE THEN
                 DISPLAY("No symbols allowed")
-            ELSE
+            ELSE THEN
                 RETURN data
             ENDIF
         ELSE THEN
