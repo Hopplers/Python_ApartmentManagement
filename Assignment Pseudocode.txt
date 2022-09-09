@@ -84,6 +84,7 @@ ENDFUNCTION
 
 FUNCTION smainmenu(username)
 	DECLARE status AS STRING
+	DECLARE i AS INTEGER
 
 	SET status AS "superadmin"
 	DISPLAY (username, ", Welcome to D&J Tenant Management System")
