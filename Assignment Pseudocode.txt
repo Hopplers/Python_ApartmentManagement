@@ -1356,7 +1356,7 @@ FUNCTION numbers_val(text)
 ENDFUNCTION
 
 
-FUNCTION nosymbol_val(text)
+FUNCTION nosymbols_val(text)
     DECLARE symbols_list, data AS STRING
     DECLARE flag AS BOOLEAN
 
@@ -1370,9 +1370,14 @@ FUNCTION nosymbol_val(text)
                 FOR EACH x IN data
                     IF i IS EQUAL TO x THEN
                         SET flag AS False
+                        CONTINUE
                     ENDIF
                 ENDFOR
             ENDFOR
+            IF flag IS EQUAL TO FALSE
+                DISPLAY("No symbols allowed")
+            ELSE
+                RETURN data
         ELSE THEN
             DISPLAY("This column requires an input!")
         ENDIF
