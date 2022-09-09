@@ -24,9 +24,9 @@ def login():  #function for log-in page
                             time.sleep(0.5)
                             print("Redirecting you to Log In page")
                             time.sleep(0.5)
-                            break  #back to while True
+                            break
                         elif option == 2:
-                            pass  #back to while flag
+                            pass
                 else:
                     password = noempty_val("Password: ")
                     flag = True  #username is valid
@@ -34,21 +34,21 @@ def login():  #function for log-in page
                         auditlogin(username)
                         if data[2] == "superadmin":
                             smainmenu(username)
-                            break  #back to while True
+                            break
                         elif data[2] == "admin":
                             amainmenu(username)
-                            break  #back to while True
+                            break
                         elif data[2] == "tenant":
                             tmainmenu(username)
-                            break  #back to while True
+                            break
                     else:
                         print("Incorrect password, please try again")
                         time.sleep(0.5)
-                    break  #back to while True
+                    break
         if not flag:
             print("Incorrect username, please try again")
             time.sleep(0.5)
-            continue  #back to while True
+            continue
 
 def auditsetup(username):  #function to update audit log when done setting up account
     dnt = currentdatetime()  #date and time import from function
@@ -557,7 +557,7 @@ def viewpaymentstatus():  #function to view payment status
             print("No matching data found")
             time.sleep(0.5)
 
-def modify_apartment_data():
+def modify_apartment_data():  #function to modify apartment data
     while True:
         file_name = "apartment"
         record = findrecord(file_name)
@@ -575,7 +575,7 @@ def modify_apartment_data():
             elif option == 3:
                 return 1
 
-def showapdata(record, column):
+def showapdata(record, column):  #function that shows apartment data to be modified
     selection = None
     replacement = None
     flag = False
@@ -605,7 +605,7 @@ def showapdata(record, column):
         time.sleep(0.5)
         return selection, replacement
 
-def replacedata(column, record, selection, replacement, file_name):
+def replacedata(column, record, selection, replacement, file_name):  #function to replace data after modifiying
     datatype = file_name
     for data in record:
         if column == data[0]:
@@ -617,7 +617,13 @@ def replacedata(column, record, selection, replacement, file_name):
     print("Data Modified")
     time.sleep(0.5)
 
-def modify_tenant_data():
+def auditmodifydata(datatype, name):  # function to update audit log when data is modified
+    dnt = currentdatetime()
+    data = (dnt + datatype + " data of " + name + " has been modify")
+    with open("audit", "a") as record:
+        record.write(data + "\n")
+
+def modify_tenant_data():  #function to modify tenant data
     while True:
         file_name = "tenant"
         record = findrecord(file_name)
@@ -635,13 +641,7 @@ def modify_tenant_data():
             elif option == 3:
                 return 1
 
-def auditmodifydata(datatype, name):
-    dnt = currentdatetime()
-    data = (dnt + datatype + " data of " + name + " has been modify")
-    with open("audit", "a") as record:
-        record.write(data + "\n")
-
-def showtndata(record, column):
+def showtndata(record, column):  #function that shows tenant data to be modified
     selection = None
     replacement = None
     flag = False
@@ -684,7 +684,7 @@ def showtndata(record, column):
         time.sleep(0.5)
         return selection, replacement
 
-def modify_payment_data():
+def modify_payment_data():  #function to modify payment data
     while True:
         file_name = "payment"
         record = findrecord(file_name)
@@ -702,7 +702,7 @@ def modify_payment_data():
             elif option == 3:
                 return 1
 
-def showpmdata(record, column):
+def showpmdata(record, column):  #function that shows payment data to be modified
     selection = None
     replacement = None
     flag = False
@@ -740,7 +740,7 @@ def showpmdata(record, column):
         time.sleep(0.5)
         return selection, replacement
 
-def remove_apartment_data():
+def remove_apartment_data():  #function to remove apartment data
     while True:
         flag = False
         file_name = "apartment"
@@ -770,7 +770,7 @@ def remove_apartment_data():
             print("No matching data found")
             time.sleep(0.5)
 
-def deletedata(file_name, record, name):
+def deletedata(file_name, record, name):  #function to update the file with data deleted
     datatype = file_name
     with open(file_name, "w") as updateData:
         for data in record:
@@ -781,13 +781,13 @@ def deletedata(file_name, record, name):
     time.sleep(0.5)
     auditdeletedata(datatype, name)
 
-def auditdeletedata(datatype, name):
+def auditdeletedata(datatype, name):  #function to update audit log when data is deleted
     dnt = currentdatetime()
     data = (dnt + datatype + " data of " + name + " has been deleted")
     with open("audit", "a") as record:
         record.write(data + "\n")
 
-def remove_tenant_data():
+def remove_tenant_data():  #function to remove tenant data
     while True:
         flag = False
         file_name = "tenant"
@@ -823,7 +823,7 @@ def remove_tenant_data():
             print("No matching data found")
             time.sleep(0.5)
 
-def remove_payment_data():
+def remove_payment_data():  #function to remove payment data
     while True:
         flag = False
         file_name = "payment"
@@ -854,7 +854,7 @@ def remove_payment_data():
             print("No matching data found")
             time.sleep(0.5)
 
-def userpasswordreset(status):
+def userpasswordreset(status):  #function to change username or password
     while True:
         print("Change Username/Password")
         time.sleep(0.5)
@@ -900,7 +900,7 @@ def userpasswordreset(status):
             time.sleep(0.5)
             continue
 
-def statuscheck(data, status):
+def statuscheck(data, status):  #function to check if they can change the username or password
     datastatus = data[2]
     power = statustonumb(status)
     power2 = statustonumb(datastatus)
@@ -914,7 +914,7 @@ def statuscheck(data, status):
         time.sleep(0.5)
         return result
 
-def statustonumb(status):
+def statustonumb(status):  #function to convert status into number
     if status == "superadmin":
         return 3
     elif status == "admin":
@@ -922,7 +922,7 @@ def statustonumb(status):
     elif status == "tenant":
         return 1
 
-def changeuserpw(option):
+def changeuserpw(option):  #function to replace the new username or password
     while True:
         validation = None
         if option == 0:
@@ -943,7 +943,7 @@ def changeuserpw(option):
             print("Wrong input please try again")
             pass
 
-def passwordstrength(password):
+def passwordstrength(password):  #function to check the password's strength
     score, hint = securityscore(password)
     if 0 <= score <= 2:
         print("Your password's security is weak")
@@ -954,7 +954,7 @@ def passwordstrength(password):
     if score != 6:
         print("To increase your password's security, make another password with: \n", ",".join(hint))
 
-def securityscore(password):
+def securityscore(password):  #function to give the password a security score
     score = 0
     hint = []
     if not password.islower():  #to check the presence of uppercase character
@@ -983,26 +983,26 @@ def securityscore(password):
         hint.append("longer password")
     return score, hint
 
-def replacedatatofile(file_name, newdata):
+def replacedatatofile(file_name, newdata):  #function to replace whole file with new data
     with open(file_name, "w") as records:
         for record in newdata:
             for item in record:
                 records.write(item + ",")
             records.write("\n")
 
-def auditchguserpw(username, type):
+def auditchguserpw(username, type):  #function to update audit log when username or password is changed
     dnt = currentdatetime()
     data = (dnt + username + " has change his/her " + type)
     with open("audit", "a") as record:
         record.write(data + "\n")
 
-def auditlogout(username):
+def auditlogout(username):  #function to update audit log when someone log out
     dnt = currentdatetime()
     data = (dnt + username + " has log out ")
     with open("audit", "a") as record:
         record.write(data + "\n")
 
-def options_val(text, selection):
+def options_val(text, selection):  #function for options validation
     while True:
         try:
             data = input(text)
@@ -1019,7 +1019,7 @@ def options_val(text, selection):
             print("Only Numbers Allowed")
             time.sleep(0.5)
 
-def characters_val(text):
+def characters_val(text):  #function of validation to accept only alphabet characters
     while True:
         i = 0
         data = input(text)
@@ -1036,7 +1036,7 @@ def characters_val(text):
             print("This column requires an input!")
             time.sleep(0.5)
 
-def numbers_val(text):
+def numbers_val(text):  #function of validation to accept only numbers
     while True:
         i = 0
         data = input(text)
@@ -1053,7 +1053,7 @@ def numbers_val(text):
             print("This column requires an input!")
             time.sleep(0.5)
 
-def nosymbols_val(text):
+def nosymbols_val(text):  #function of validation to deny symbol
     symbols_list = "~`!@#$%^&*()-_=\"+[]{}|\:;'?/<>,."
     flag = True
     while True:
@@ -1073,7 +1073,7 @@ def nosymbols_val(text):
             print("This column requires an input!")
             time.sleep(0.5)
 
-def noempty_val(text):
+def noempty_val(text):  #function of validation to deny blanks
     while True:
         data = input(text)
         if len(data) > 0:
@@ -1082,7 +1082,7 @@ def noempty_val(text):
             print("This column requires an input!")
             time.sleep(0.5)
 
-def date_val(text):
+def date_val(text):  #function of validation to accept only date in (DD/MM/YY)
     while True:
         data = input(text)
         if len(data) > 0:
@@ -1098,7 +1098,7 @@ def date_val(text):
             print("This column requires an input!")
             time.sleep(0.5)
 
-def month_val(text):
+def month_val(text):  #function of validation to accept only month in (MM/YY)
     while True:
         data = input(text)
         if len(data) > 0:
