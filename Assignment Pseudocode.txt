@@ -125,8 +125,7 @@ FUNCTION view_audit_log()
 	ENDFOR
 	random = CALL FUNCTION noempty_val("Enter anything to continue")
 	DISPLAY ("Redirecting you to Main Menu")
-	SET i AS 1
-	RETURN i
+	RETURN 1
 ENDFUNCTION
 
 FUNCTION new_user(status,username)
@@ -152,8 +151,7 @@ FUNCTION new_user(status,username)
 			SET details AS [username, "", position]
 			APPEND details INTO data
 			CALL FUNCTION savedata(file_name, data, username, position)
-			SET i AS 1
-			RETURN i
+			RETURN 1
 		ENDFOR
 	ENDWHILE
 ENDFUNCTION
@@ -303,11 +301,9 @@ FUNCTION new_apartment_data()
 			IF option IS EQUALS TO 1 THEN
 				CONTINUE
 			ELSE IF option IS EQUALS TO 2 THEN
-				SET i EQUALS TO 2
-				RETURN i
+				RETURN 2
 			ELSE IF option IS EQUALS TO 3 THEN
-				SET i EQUALS TO 1
-				RETURN i
+				RETURN 1
 			ENDIF
         ENDIF
 	ENDWHILE
@@ -412,11 +408,9 @@ FUNCTION new_tenant_data(status)
 					IF option IS EQUALS TO 1 THEN
 						BREAK
 					ELSE IF option IS EQUALS TO 2 THEN
-						SET i AS 2
-						RETURN i
+						RETURN 2
 					ELSE IF option IS EQUALS TO 3 THEN
-						SET i AS 1
-						RETURN i
+						RETURN 1
 					ENDIF
 				ENDIF
 			ENDWHILE
@@ -474,11 +468,9 @@ FUNCTION new_payment_data()
 					IF option IS EQUALS TO 1 THEN
 						BREAK
 					ELSE IF option IS EQUALS TO 2 THEN
-						SET i AS 2
-						RETURN i
+						RETURN 2
 					ELSE IF option IS EQUALS TO 3 THEN
-						SET i AS 1
-						RETURN i
+						RETURN 1
 					ENDIF
 				ENDIF
 			ENDWHILE
@@ -564,11 +556,9 @@ FUNCTION view_apartment_data()
 			IF option IS EQUALS TO 1 THEN
 				CONTINUE
 			ELSE IF option IS EQUALS TO 2 THEN
-				SET i AS 3
-				RETURN i
+				RETURN 3
 			ELSE IF option IS EQUALS TO 3 THEN
-				SET i AS 1
-				RETURN i
+				RETURN 1
 			ENDIF
 		ELSE THEN
 			DISPLAY ("No matching data found")
@@ -632,11 +622,9 @@ FUNCTION view_tenant_data()
 			IF option IS EQUALS TO 1 THEN
 				CONTINUE
 			ELSE IF option IS EQUALS TO 2 THEN
-				SET i AS 3
-				RETURN i
+				RETURN 3
 			ELSE IF option IS EQUALS TO 3 THEN
-				SET i AS 1
-				RETURN i
+				RETURN 1
 			ENDIF
 		ELSE THEN
 			DISPLAY ("No matching data found")
@@ -673,11 +661,9 @@ FUNCTION view_payment_data()
 			IF option IS EQUALS TO 1 THEN
 				CONTINUE
 			ELSE IF option IS EQUALS TO 2 THEN
-				SET i AS 3
-				RETURN i
+				RETURN 3
 			ELSE IF option IS EQUALS TO 3 THEN
-				SET i AS 1
-				RETURN i
+				RETURN 1
 			ENDIF
 		ELSE THEN
 			DISPLAY ("No matching data found")
@@ -715,11 +701,9 @@ FUNCTION viewpaymentstatus()
 			IF option IS EQUALS TO 1 THEN
 				CONTINUE
 			ELSE IF option IS EQUALS TO 2 THEN
-				SET I AS 3
-				RETURN i
+				RETURN 3
 			ELSE IF option IS EQUALS TO 3 THEN
-				SET i AS 1
-				RETURN i
+				RETURN 1
 			ENDIF
 		ELSE THEN
 			DISPLAY ("No matching data found")
@@ -745,11 +729,9 @@ FUNCTION modify_apartment_data()
             IF option IS EQUAL TO 1 THEN
                 CONTINUE
             ELSE IF option IS EQUAL TO 2 THEN
-                SET i AS 4
                 RETURN 4
             ELSE IF option IS EQUAL TO 3 THEN
-                SET i AS 1
-                RETURN i
+                RETURN 1
             ENDIF
         ENDIF
     ENDWHILE
@@ -824,11 +806,9 @@ FUNCTION modify_tenant_data()
             IF option IS EQUAL TO 1 THEN
                 CONTINUE
             ELSE IF option IS EQUAL TO 2 THEN
-                SET i AS 4
                 RETURN 4
             ELSE IF option IS EQUAL TO 3 THEN
-                SET i AS 1
-                RETURN i
+                RETURN 1
             ENDIF
         ENDIF
     ENDWHILE
@@ -910,11 +890,9 @@ FUNCTION modify_payment_data()
             IF option IS EQUAL TO 1 THEN
                 CONTINUE
             ELSE IF option IS EQUAL TO 2 THEN
-                SET i AS 4
                 RETURN 4
             ELSE IF option IS EQUAL TO 3 THEN
-                SET i AS 1
-                RETURN i
+                RETURN 1
             ENDIF
         ENDIF
     ENDWHILE
@@ -976,7 +954,7 @@ FUNCTION remove_apartment_data()
         apartment_record = CALL FUNCTION findrecord(file_name)
         apartment_no = CALL FUNCTION noempty_val("Which Apartment's Data do you wish to Delete? (Enter Apartment No.)")
         FOR EACH apdata IN apartment_record
-            IF apdata[0] IS EQUAL TO tnid_no THEN
+            IF apdata[0] IS EQUAL TO apartment_no THEN
                 DISPLAY("The matching data for", apartment_no, " is found:")
                 DISPLAY("Apartment No.            :", apdata[0])
                 DISPLAY("Date of Acquisition      :", apdata[1])
@@ -995,11 +973,9 @@ FUNCTION remove_apartment_data()
             IF option IS EQUAL TO 1 THEN
                 CONTINUE
             ELSE IF option IS EQUAL TO 2 THEN
-                SET i AS 5
-                RETURN i
+                RETURN 5
             ELSE IF option IS EQUAL TO 3 THEN
-                SET i AS 1
-                RETURN i
+                RETURN 1
             ENDIF
         ELSE THEN
             DISPLAY("No matching data found")
@@ -1066,11 +1042,9 @@ FUNCTION remove_tenant_data()
             IF option IS EQUAL TO 1 THEN
                 CONTINUE
             ELSE IF option IS EQUAL TO 2 THEN
-                SET i AS 5
-                RETURN i
+                RETURN 5
             ELSE IF option IS EQUAL TO 3 THEN
-                SET i AS 1
-                RETURN i
+                RETURN 1
             ENDIF
         ELSE THEN
             DISPLAY("No matching data found")
@@ -1110,11 +1084,9 @@ FUNCTION remove_payment_data()
             IF option IS EQUAL TO 1 THEN
                 CONTINUE
             ELSE IF option IS EQUAL TO 2 THEN
-                SET i AS 5
-                RETURN i
+                RETURN 5
             ELSE IF option IS EQUAL TO 3 THEN
-                SET i AS 1
-                RETURN i
+                RETURN 1
             ENDIF
         ELSE THEN
             DISPLAY("No matching data found")
@@ -1148,12 +1120,12 @@ FUNCTION userpasswordreset(status)
                     ENDIF
                     option = option - 1
                     replacement = CALL FUNCTION changeuserpw(option)
-                    selection = CALL FUNCTION options_val("Do you want to save the new " + type + "(1) or change another new " + type + "(2) ?\n", 2)
+                    selection = CALL FUNCTION options_val("Do you want to save the new " + type + "(1) or change another new " + type + "(2) ?", 2)
                     IF selection IS EQUAL TO 1 THEN
                         SET data[option] AS replacement
                         CALL FUNCTION replacedatatofile(file_name,userpw)
-                        DISPLAY ("The data have been changed!")
                         CALL FUNCTION auditchguserpw(username, type)
+                        DISPLAY ("The data have been changed!")
                         DISPLAY ("Redirecting you to Main Menu")
                         SET result AS "back"
                         BREAK
@@ -1166,10 +1138,10 @@ FUNCTION userpasswordreset(status)
         IF result IS EQUAL TO "no" THEN
             CONTINUE
         ELSE IF result IS EQUAL TO "back" THEN
-            SET i as 1
-            RETURN i
+            RETURN 1
         ELSE THEN
             DISPLAY("No matching Username and Password found, please try again")
+            CONTINUE
     ENDWHILE
 ENDFUNCTION
 
@@ -1183,9 +1155,9 @@ FUNCTION statuscheck(data, status)
     IF power IS BIGGER OR EQUAL TO power2 THEN
         PASS
     ELSE THEN
+        SET result AS "no"
         DISPLAY("You do not have the authority to change this Username or Password")
         DISPLAY("Redirecting you to Change Username/Password page")
-        SET result AS "no"
         RETURN result
     ENDIF
 ENDFUNCTION
