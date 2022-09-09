@@ -1374,7 +1374,7 @@ FUNCTION nosymbols_val(text)
                     ENDIF
                 ENDFOR
             ENDFOR
-            IF flag IS EQUAL TO FALSE
+            IF flag IS EQUAL TO FALSE THEN
                 DISPLAY("No symbols allowed")
             ELSE
                 RETURN data
