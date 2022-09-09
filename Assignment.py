@@ -105,8 +105,7 @@ def view_audit_log():
         print(data[0])
     random = noempty_val("\nEnter anything to continue\n")
     print("Redirecting you to Main Menu")
-    i = 1
-    return i
+    return 1
 
 def new_user(status,username):
     while True:
@@ -128,8 +127,7 @@ def new_user(status,username):
             details = [username, "", position]
             data.append(details)
             savedata(file_name, data, username, position)
-            i = 1
-            return i
+            return 1
 
 def amainmenu(username):  # main menu for admin
     status = "admin"
@@ -254,11 +252,9 @@ def new_apartment_data():  #function for entering new apartment data
             if option == 1:
                 continue
             elif option == 2:
-                i = 2
-                return i
+                return 2
             elif option == 3:
-                i = 1
-                return i
+                return 1
 
 def isAvailable(file_name, position, text):
     data = text
@@ -341,11 +337,9 @@ def new_tenant_data(status):  #function for entering new tenant data
                     if option == 1:
                         break
                     elif option == 2:
-                        i = 2
-                        return i
+                        return 2
                     elif option == 3:
-                        i = 1
-                        return i
+                        return 1
 
 def newnumbgen(file_name):
     lines = fileline(file_name)
@@ -390,11 +384,9 @@ def new_payment_data():  #function for entering new payment data
                     if option == 1:
                         break
                     elif option == 2:
-                        i = 2
-                        return i
+                        return 2
                     elif option == 3:
-                        i = 1
-                        return i
+                        return 1
 
 def paymentstatus(payment_month, tenant_id, apartment_no, amount_paid):
     flag = False
@@ -453,11 +445,9 @@ def view_apartment_data():
             if option == 1:
                 continue
             elif option == 2:
-                i = 3
-                return i
+                return 3
             elif option == 3:
-                i = 1
-                return i
+                return 1
         else:
             print("No matching data found")
             time.sleep(0.5)
@@ -503,11 +493,9 @@ def view_tenant_data():
             if option == 1:
                 continue
             elif option == 2:
-                i = 3
-                return i
+                return 3
             elif option == 3:
-                i = 1
-                return i
+                return 1
         else:
             print("No matching data found")
             time.sleep(0.5)
@@ -533,11 +521,9 @@ def view_payment_data():
             if option == 1:
                 continue
             elif option == 2:
-                i = 3
-                return i
+                return 3
             elif option == 3:
-                i = 1
-                return i
+                return 1
         else:
             print("No matching data found")
             time.sleep(0.5)
@@ -564,11 +550,9 @@ def viewpaymentstatus():
             if option == 1:
                 continue
             elif option == 2:
-                i = 3
-                return i
+                return 3
             elif option == 3:
-                i = 1
-                return i
+                return 1
         else:
             print("No matching data found")
             time.sleep(0.5)
@@ -587,11 +571,9 @@ def modify_apartment_data():
             if option == 1:
                 continue
             elif option == 2:
-                i = 4
-                return i
+                return 4
             elif option == 3:
-                i = 1
-                return i
+                return 1
 
 def showapdata(record, column):
     selection = None
@@ -649,11 +631,9 @@ def modify_tenant_data():
             if option == 1:
                 continue
             elif option == 2:
-                i = 4
-                return i
+                return 4
             elif option == 3:
-                i = 1
-                return i
+                return 1
 
 def auditmodifydata(datatype, name):
     dnt = currentdatetime()
@@ -718,11 +698,9 @@ def modify_payment_data():
             if option == 1:
                 continue
             elif option == 2:
-                i = 4
-                return i
+                return 4
             elif option == 3:
-                i = 1
-                return i
+                return 1
 
 def showpmdata(record, column):
     selection = None
@@ -785,11 +763,9 @@ def remove_apartment_data():
             if option == 1:
                 continue
             elif option == 2:
-                i = 5
-                return i
+                return 5
             elif option == 3:
-                i = 1
-                return i
+                return 1
         else:
             print("No matching data found")
             time.sleep(0.5)
@@ -840,11 +816,9 @@ def remove_tenant_data():
             if option == 1:
                 continue
             elif option == 2:
-                i = 5
-                return i
+                return 5
             elif option == 3:
-                i = 1
-                return i
+                return 1
         else:
             print("No matching data found")
             time.sleep(0.5)
@@ -873,11 +847,9 @@ def remove_payment_data():
             if option == 1:
                 continue
             elif option == 2:
-                i = 5
-                return i
+                return 5
             elif option == 3:
-                i = 1
-                return i
+                return 1
         else:
             print("No matching data found")
             time.sleep(0.5)
@@ -922,11 +894,11 @@ def userpasswordreset(status):
         if result == "no":
             continue
         elif result == "back":
-            i = 1
-            return i
+            return 1
         else:
             print("No matching Username and Password found, please try again")
             time.sleep(0.5)
+            continue
 
 def statuscheck(data, status):
     datastatus = data[2]
