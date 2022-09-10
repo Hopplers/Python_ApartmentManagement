@@ -62,7 +62,7 @@ FUNCTION auditsetup(username)
 
 	dnt = CALL FUNCTION currentdatetime()
 	SET data AS (dnt + username + " has set up his/her account ")
-	OPEN "audit" IN APPEND MODE AS record THEN
+	OPEN "audit" IN APPEND MODE AS record
 	WRITE data WITH "\n" IN record
 ENDFUNCTION
 
@@ -71,7 +71,7 @@ FUNCTION auditlogin(username)
 
 	dnt = CALL FUNCTION currentdatetime()
 	SET data AS (dnt + username + " has log in ")
-	OPEN "audit" IN APPEND MODE AS record THEN
+	OPEN "audit" IN APPEND MODE AS record
 	WRITE data WITH "\n" IN record
 ENDFUNCTION
 
