@@ -1,3 +1,6 @@
+#SIA JUN IAN TP064565
+#NICHOLAS TAN QI YANG TP064457
+
 def login():  #function for log-in page
     while True:
         flag = False
@@ -762,6 +765,10 @@ def remove_apartment_data():  #function to remove apartment data
                     deletedata(file_name, apartment_record, apdata[0])
                     flag = True
                     break
+                else:
+                    print("No data is deleted")
+                    flag = True
+                    break
         if flag:
             option = options_val("Do you want to delete other Apartment Data(1), delete another type of data(2) or return to Main Menu(3)?\n", 3)
             if option == 1:
@@ -816,6 +823,10 @@ def remove_tenant_data():  #function to remove tenant data
                     deletedata(file_name, tenant_record, tndata[0])
                     flag = True
                     break
+                else:
+                    print("No data is deleted")
+                    flag = True
+                    break
         if flag:
             option = options_val("Do you want to delete other Tenant Data(1), delete another type of data(2) or return to Main Menu(3)?\n", 3)
             if option == 1:
@@ -846,6 +857,10 @@ def remove_payment_data():  #function to remove payment data
                 if confirmation.lower() == "x":
                     payment_record.remove(pmdata)
                     deletedata(file_name, payment_record, pmdata[0])
+                    flag = True
+                    break
+                else:
+                    print("No data is deleted")
                     flag = True
                     break
         if flag:
