@@ -435,9 +435,9 @@ FUNCTION fileline(file_name)
 
 	SET lines AS 0
 	OPEN file_name IN READ MODE AS records
-    FOR line IN records
-        lines = lines + 1
-    RETURN lines
+	FOR line IN records
+		lines = lines + 1
+	RETURN lines
 ENDFUNCTION
 
 FUNCTION new_payment_data()
@@ -450,13 +450,13 @@ FUNCTION new_payment_data()
 		newnub = CALL FUNCTION newnumbgen("payment_count")
 		SET payment_id AS "PM" WITH newnumb
 		tenant_id = CALL FUNCTION nosymbols_val("Enter Tenant ID No.: ")
-		IF NOT CALL FUNCTION ("tenant", 0, tenant_id) THEN
+		IF CALL FUNCTION isAvailable("tenant", 0, tenant_id) IS EQUAL TO False THEN
 			DISPLAY ("This Tenant ID no. does not exist, please re-enter the Tenant ID no.")
 			CONTINUE
 		ELSE THEN
 			WHILE TRUE THEN
 				apartment_no = CALL FUNCTION noempty_val("Enter Apartment No.: ")
-				IF NOT CALL FUNCTION isAvailable("apartment", 0, apartment_no) THEN
+				IF CALL FUNCTION isAvailable("apartment", 0, apartment_no) IS EQUAL TO False THEN
 					DISPLAY ("This Apartment No. does not exist, please re-enter the Apartment No.")
 					CONTINUE
 				ELSE THEN
@@ -790,6 +790,15 @@ FUNCTION replacedata(column, record, selection, replacement, file_name)
     DISPLAY("Data Modified")
 ENDFUNCTION
 
+FUNCTION auditmodifydata(datatype, name)
+    DECLARE dnt, data as STRING
+
+    dnt = CALL FUNCTION currentdatetime()
+    SET data AS (dnt + datatype + " data of " + name + " has been modify")
+    OPEN "audit" IN APPEND MODE AS record
+    WRITE data WITH "\n" IN record
+ENDFUNCTION
+
 FUNCTION modify_tenant_data()
     DECLARE file_name, column AS STRING
     DECLARE record AS ARRAY
@@ -814,15 +823,6 @@ FUNCTION modify_tenant_data()
             ENDIF
         ENDIF
     ENDWHILE
-ENDFUNCTION
-
-FUNCTION auditmodifydata(datatype, name)
-    DECLARE dnt, data as STRING
-
-    dnt = CALL FUNCTION currentdatetime()
-    SET data AS (dnt + datatype + " data of " + name + " has been modify")
-    OPEN "audit" IN APPEND MODE AS record
-    WRITE data WITH "\n" IN record
 ENDFUNCTION
 
 FUNCTION showtndata(record, column)
