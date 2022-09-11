@@ -118,7 +118,7 @@ def new_user(status,username):  #function to add newuser
             position = "tenant"
         records = findrecord(file_name)
         for lines in records:
-            if lines[0] == username:  #when the smae username is found
+            if lines[0] == username:  #when the same username is found
                 print("This username has been taken, please enter another username")
                 time.sleep(0.5)
                 break  #back to while True
@@ -590,6 +590,7 @@ def showapdata(record, column):  #function that shows apartment data to be modif
             selection = options_val("Which data do you wish to modify?\n", 4)
             selection -= 1
             flag = True
+            break
     if flag:
         if selection == 0:
             replacement = noempty_val("What do you want to replace the data with?\n")
@@ -605,7 +606,7 @@ def showapdata(record, column):  #function that shows apartment data to be modif
         time.sleep(0.5)
         return selection, replacement
 
-def replacedata(column, record, selection, replacement, file_name):  #function to replace data after modifiying
+def replacedata(column, record, selection, replacement, file_name):  #function to replace data after modifying
     datatype = file_name
     for data in record:
         if column == data[0]:
@@ -662,19 +663,20 @@ def showtndata(record, column):  #function that shows tenant data to be modified
             selection = options_val("Which data do you wish to modify?\n", 10)
             selection -= 1
             flag = True
+            break
     if flag:
         if selection == 0:
             print("Tenant ID No. could not be changed, please try again")
             time.sleep(0.5)
             pass
         elif selection == (1 or 2 or 5 or 6 or 7):
-            replacement = characters_val("What do you want to replace the data with?1\n")
+            replacement = characters_val("What do you want to replace the data with?\n")
             return selection, replacement
         elif selection == 3:
-            replacement = numbers_val("What do you want to replace the data with?2\n")
+            replacement = numbers_val("What do you want to replace the data with?\n")
             return selection, replacement
         elif selection == (4 or 8):
-            replacement = noempty_val("What do you want to replace the data with?3\n")
+            replacement = noempty_val("What do you want to replace the data with?\n")
             return selection, replacement
         elif selection == 9:
             replacement = date_val("What do you want to replace the data with? (DD/MM/YY) \n")
@@ -718,6 +720,7 @@ def showpmdata(record, column):  #function that shows payment data to be modifie
             selection = options_val("Which data do you wish to modify?\n", 5)
             selection -= 1
             flag = True
+            break
     if flag:
         if selection == 0:
             print("Payment ID No. could not be changed, please try again")
@@ -758,6 +761,7 @@ def remove_apartment_data():  #function to remove apartment data
                     apartment_record.remove(apdata)
                     deletedata(file_name, apartment_record, apdata[0])
                     flag = True
+                    break
         if flag:
             option = options_val("Do you want to delete other Apartment Data(1), delete another type of data(2) or return to Main Menu(3)?\n", 3)
             if option == 1:
@@ -811,6 +815,7 @@ def remove_tenant_data():  #function to remove tenant data
                     tenant_record.remove(tndata)
                     deletedata(file_name, tenant_record, tndata[0])
                     flag = True
+                    break
         if flag:
             option = options_val("Do you want to delete other Tenant Data(1), delete another type of data(2) or return to Main Menu(3)?\n", 3)
             if option == 1:
@@ -842,6 +847,7 @@ def remove_payment_data():  #function to remove payment data
                     payment_record.remove(pmdata)
                     deletedata(file_name, payment_record, pmdata[0])
                     flag = True
+                    break
         if flag:
             option = options_val("Do you want to delete other Payment Data(1), delete another type of data(2) or return to Main Menu(3)?\n", 3)
             if option == 1:
