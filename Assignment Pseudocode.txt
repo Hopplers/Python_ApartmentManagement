@@ -757,6 +757,7 @@ FUNCTION showapdata(record, column)
             selection = CALL FUNCTION options_val("Which data do you wish to modify?", 4)
             selection = selection - 1
             SET flag AS True
+            BREAK
         ENDWHILE
     ENDFOR
     IF flag IS EQUAL TO TRUE THEN
@@ -849,6 +850,7 @@ FUNCTION showtndata(record, column)
             selection = CALL FUNCTION options_val("Which data do you wish to modify?", 10)
             selection = selection - 1
             SET flag AS True
+            BREAK
         ENDWHILE
     ENDFOR
     IF flag IS EQUAL TO TRUE THEN
@@ -919,6 +921,7 @@ FUNCTION showpmdata(record, column)
             selection = CALL FUNCTION options_val("Which data do you wish to modify?", 5)
             selection = selection - 1
             SET flag AS True
+            BREAK
         ENDWHILE
     ENDFOR
     IF flag IS EQUAL TO TRUE THEN
@@ -967,6 +970,11 @@ FUNCTION remove_apartment_data()
                     apdata IS REMOVE FROM apartment_record
                     CALL FUNCTION deletedata(file_name, apartment_record, apdata[0])
                     SET flag AS True
+                    BREAK
+                ELSE
+                    DISPLAY("No data is deleted")
+                    SET flag AS True
+                    BREAK
                 ENDIF
             ENDIF
         ENDFOR
@@ -1036,6 +1044,11 @@ FUNCTION remove_tenant_data()
                     tndata IS REMOVE FROM tenant_record
                     CALL FUNCTION deletedata(file_name, tenant_record, tndata[0])
                     SET flag AS True
+                    BREAK
+                ELSE
+                    DISPLAY("No data is deleted")
+                    SET flag AS True
+                    BREAK
                 ENDIF
             ENDIF
         ENDFOR
@@ -1053,6 +1066,8 @@ FUNCTION remove_tenant_data()
         ENDIF
     ENDWHILE
 ENDFUNCTION
+
+
 
 FUNCTION remove_payment_data()
     DECLARE flag AS BOOLEAN
@@ -1078,6 +1093,11 @@ FUNCTION remove_payment_data()
                     pmdata IS REMOVE FROM payment_record
                     CALL FUNCTION deletedata(file_name, payment_record, pmdata[0])
                     SET flag AS True
+                    BREAK
+                ELSE
+                    DISPLAY("No data is deleted")
+                    SET flag AS True
+                    BREAK
                 ENDIF
             ENDIF
         ENDFOR
