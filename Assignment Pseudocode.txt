@@ -169,7 +169,7 @@ FUNCTION amainmenu(username)
 			i = CALL FUNCTION amainmenuselect()
 
 		ELSE IF i IS EQUALS TO 2 THEN
-			GET option CALL FUNCTION options_val("Which type of New Data? 1. New Apartment Data 2. New Tenant Data 3. New Payment Data 4. Return to Main Menu", 4)
+			option = CALL FUNCTION options_val("Which type of New Data? 1. New Apartment Data 2. New Tenant Data 3. New Payment Data 4. Return to Main Menu", 4)
 			IF option IS EQUALS TO 1 THEN
 				i = CALL FUNCTION new_apartment_data()
 			ELSE IF option IS EQUALS TO 2 THEN
@@ -181,7 +181,7 @@ FUNCTION amainmenu(username)
 			END IF
 
 		ELSE IF i IS EQUALS TO 3 THEN
-			GET option CALL FUNCTION options_val("Which Data do you wish to search? 1. Apartment Data 2. Tenant Data 3. Payment Data 4. Payment Status 5. Return to Main Menu", 5)
+			option = CALL FUNCTION options_val("Which Data do you wish to search? 1. Apartment Data 2. Tenant Data 3. Payment Data 4. Payment Status 5. Return to Main Menu", 5)
 			IF option IS EQUALS TO 1 THEN
 				i = CALL FUNCTION view_apartment_data()
 			ELSE IF option IS EQUALS TO 2 THEN
@@ -195,7 +195,7 @@ FUNCTION amainmenu(username)
 			ENDIF
 
 		ELSE IF i IS EQUALS TO 4 THEN
-			GET option CALL FUNCTION options_val("Which Data do you wish to modify? 1. Apartment Data 2. Tenant Data 3. Payment Data 4. Return to Main Menu", 4)
+			option = CALL FUNCTION options_val("Which Data do you wish to modify? 1. Apartment Data 2. Tenant Data 3. Payment Data 4. Return to Main Menu", 4)
 			IF option IS EQUALS TO 1 THEN
 				i = CALL FUNCTION modify_apartment_data()
 			ELSE IF option IS EQUALS TO 2 THEN
@@ -207,7 +207,7 @@ FUNCTION amainmenu(username)
 			ENDIF
 
 		ELSE IF i IS EQUALS TO 5 THEN
-			GET option CALL FUNCTION options_val("Which Data do you wish to delete? 1. Apartment Data 2. Tenant Data 3. Payment Data 4. Return to Main Menu", 4)
+			option = CALL FUNCTION options_val("Which Data do you wish to delete? 1. Apartment Data 2. Tenant Data 3. Payment Data 4. Return to Main Menu", 4)
 			IF option IS EQUALS TO 1 THEN
 				i = CALL FUNCTION remove_apartment_data()
 			ELSE IF option IS EQUALS TO 2 THEN
@@ -431,13 +431,13 @@ FUNCTION newnumbgen(file_name)
 ENDFUNCTION
 
 FUNCTION fileline(file_name)
-	DECLARE lines AS INTEGER
+    DECLARE lines AS INTEGER
 
-	SET lines AS 0
-	OPEN file_name IN READ MODE AS records
-	FOR line IN records
-		lines = lines + 1
-	RETURN lines
+    SET lines AS 0
+    OPEN file_name IN READ MODE AS records
+    FOR line IN records
+        lines = lines + 1
+    RETURN lines
 ENDFUNCTION
 
 FUNCTION new_payment_data()
