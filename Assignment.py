@@ -1112,7 +1112,7 @@ def date_val(text):  #function of validation to accept only date in (DD/MM/YY)
                 datetime(int(year), int(month), int(day))
                 return data
 
-            except ValueError:
+            except ValueError:  #when input value is not integer
                 print("Invalid input! Please enter according to the format!")
                 time.sleep(0.5)
         else:
@@ -1129,7 +1129,7 @@ def month_val(text):  #function of validation to accept only month in (MM/YY)
                 datetime(int(year), int(month), int(day))
                 return data
 
-            except ValueError:
+            except ValueError:  #when input value is not integer
                 print("Invalid input! Please enter according to the format!")
                 time.sleep(0.5)
         else:
